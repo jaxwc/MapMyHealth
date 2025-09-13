@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, FormEvent, useRef, useEffect } from 'react';
-import { HealthData } from '@/app/page';
-import { SendHorizonal } from 'lucide-react';
+import { useState, FormEvent, useRef, useEffect } from "react";
+import { HealthData } from "@/app/page";
+import { SendHorizonal } from "lucide-react";
 
 interface Message {
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   text: string;
 }
 
@@ -14,55 +14,59 @@ interface ChatPanelProps {
 }
 
 const TypingIndicator = () => (
-    <div className="flex items-center space-x-1.5 p-3">
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse [animation-delay:-0.15s]"></div>
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
-    </div>
+  <div className="flex items-center space-x-1.5 p-3">
+    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
+    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse [animation-delay:-0.15s]"></div>
+    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+  </div>
 );
 
 export default function ChatPanel({ onNewData }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { sender: 'ai', text: "How can I help you today?" }
+    { sender: "ai", text: "How can I help you today?" },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { sender: 'user', text: input };
-    setMessages(prev => [...prev, userMessage]);
+    const userMessage: Message = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
     const currentInput = input;
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: currentInput }),
       });
 
       if (!response.ok) {
-        throw new Error('API request failed');
+        throw new Error("API request failed");
       }
 
       const data = await response.json();
-      const aiMessage: Message = { sender: 'ai', text: data.responseText };
-      setMessages(prev => [...prev, aiMessage]);
-      onNewData({ conditions: data.conditions });
+      const aiMessage: Message = { sender: "ai", text: data.responseText };
+      setMessages((prev) => [...prev, aiMessage]);
+
+      onNewData(data.analysis);
 
     } catch (error) {
       console.error("Failed to fetch AI response:", error);
-      const errorMessage: Message = { sender: 'ai', text: "Sorry, I couldn't get a response. Please try again." };
-      setMessages(prev => [...prev, errorMessage]);
+      const errorMessage: Message = {
+        sender: "ai",
+        text: "Sorry, I couldn't get a response. Please try again.",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -70,13 +74,25 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
 
   return (
     <div className="flex flex-col h-full bg-slate-800 rounded-xl border border-pink-500/30 shadow-lg shadow-pink-500/10 p-6">
-
-      <h2 className="text-2xl font-bold mb-4 text-slate-100 flex-shrink-0">MapMyHealth</h2>
+      <h2 className="text-2xl font-bold mb-4 text-slate-100 flex-shrink-0">
+        MapMyHealth
+      </h2>
 
       <div className="flex-grow overflow-y-auto mb-4 pr-2">
         {messages.map((msg, index) => (
-          <div key={index} className={`flex flex-col mb-4 ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-            <div className={`rounded-2xl p-3 max-w-sm ${msg.sender === 'user' ? 'bg-cyan-500 text-slate-900 font-semibold rounded-br-none' : 'bg-slate-700 text-slate-200 rounded-bl-none'}`}>
+          <div
+            key={index}
+            className={`flex flex-col mb-4 ${
+              msg.sender === "user" ? "items-end" : "items-start"
+            }`}
+          >
+            <div
+              className={`rounded-2xl p-3 max-w-sm ${
+                msg.sender === "user"
+                  ? "bg-cyan-500 text-slate-900 font-semibold rounded-br-none"
+                  : "bg-slate-700 text-slate-200 rounded-bl-none"
+              }`}
+            >
               <p className="whitespace-pre-wrap">{msg.text}</p>
             </div>
           </div>
@@ -91,7 +107,10 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex items-center space-x-2 flex-shrink-0">
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center space-x-2 flex-shrink-0"
+      >
         <input
           type="text"
           value={input}
