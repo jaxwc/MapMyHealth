@@ -1,0 +1,121 @@
+[
+  {
+    "id": "sore_throat",
+    "label": "Sore throat",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "fever",
+    "label": "Fever",
+    "kind": "symptom",
+    "units": "°F",
+    "isRedFlag": false
+  },
+  {
+    "id": "cough",
+    "label": "Cough",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "tonsillar_exudates",
+    "label": "Tonsillar exudates",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "tender_cervical_nodes",
+    "label": "Tender anterior cervical nodes",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "runny_nose",
+    "label": "Runny nose",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "fatigue",
+    "label": "Marked fatigue",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "sore_throat_duration",
+    "label": "Sore throat >7 days",
+    "kind": "history",
+    "units": "days",
+    "isRedFlag": false
+  },
+  {
+    "id": "rapid_strep_positive",
+    "label": "Rapid strep test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "rapid_strep_negative",
+    "label": "Rapid strep test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "throat_culture_positive",
+    "label": "Throat culture positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "throat_culture_negative",
+    "label": "Throat culture negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "monospot_positive",
+    "label": "Monospot test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "monospot_negative",
+    "label": "Monospot test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "drooling",
+    "label": "Drooling",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "stridor",
+    "label": "Stridor",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "neck_swelling_fever",
+    "label": "Neck swelling with fever",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  }
+]

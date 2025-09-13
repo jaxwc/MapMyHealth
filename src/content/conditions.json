@@ -1,0 +1,284 @@
+[
+  {
+    "id": "streptococcal_pharyngitis",
+    "label": "Streptococcal pharyngitis",
+    "description": "Bacterial infection of the pharynx caused by group A Streptococcus",
+    "priors": {
+      "default": 0.15,
+      "byDemo": [
+        {
+          "ageRange": { "min": 3, "max": 14 },
+          "prior": 0.30
+        },
+        {
+          "ageRange": { "min": 15, "max": 44 },
+          "prior": 0.10
+        },
+        {
+          "ageRange": { "min": 45 },
+          "prior": 0.05
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.40,
+      "leadDelta": 0.20
+    },
+    "lrTable": [
+      {
+        "target": "tonsillar_exudates",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Moderate predictor of strep",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "tender_cervical_nodes",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Moderate predictor of strep",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "fever",
+        "LRpos": 1.7,
+        "LRneg": 0.5,
+        "note": "Mild predictor of strep",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "cough",
+        "LRpos": 0.3,
+        "LRneg": 2.1,
+        "note": "Cough suggests viral etiology",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "runny_nose",
+        "LRpos": 0.2,
+        "LRneg": 2.5,
+        "note": "Runny nose suggests viral etiology",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "rapid_strep_positive",
+        "LRpos": 17.0,
+        "LRneg": 0.05,
+        "note": "Strong positive predictor",
+        "source": {
+          "source": "Rapid Strep Test Performance",
+          "year": 2020
+        }
+      },
+      {
+        "target": "rapid_strep_negative",
+        "LRpos": 0.05,
+        "LRneg": 17.0,
+        "note": "Strong negative predictor",
+        "source": {
+          "source": "Rapid Strep Test Performance",
+          "year": 2020
+        }
+      },
+      {
+        "target": "throat_culture_positive",
+        "LRpos": 50.0,
+        "LRneg": 0.02,
+        "note": "Gold standard positive",
+        "source": {
+          "source": "Throat Culture Performance",
+          "year": 2019
+        }
+      },
+      {
+        "target": "throat_culture_negative",
+        "LRpos": 0.02,
+        "LRneg": 50.0,
+        "note": "Gold standard negative",
+        "source": {
+          "source": "Throat Culture Performance",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendations": {
+      "confirmed": "targeted-care",
+      "likely": "supportive-care",
+      "inconclusive": "watchful-waiting"
+    }
+  },
+  {
+    "id": "viral_pharyngitis",
+    "label": "Viral pharyngitis",
+    "description": "Viral infection of the pharynx, most commonly caused by rhinovirus, adenovirus, or coronavirus",
+    "priors": {
+      "default": 0.70,
+      "byDemo": [
+        {
+          "ageRange": { "min": 3, "max": 14 },
+          "prior": 0.60
+        },
+        {
+          "ageRange": { "min": 15, "max": 44 },
+          "prior": 0.75
+        },
+        {
+          "ageRange": { "min": 45 },
+          "prior": 0.80
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.15
+    },
+    "lrTable": [
+      {
+        "target": "cough",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Cough suggests viral etiology",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "runny_nose",
+        "LRpos": 2.5,
+        "LRneg": 0.2,
+        "note": "Runny nose suggests viral etiology",
+        "source": {
+          "source": "Centor Criteria",
+          "year": 1981
+        }
+      },
+      {
+        "target": "rapid_strep_negative",
+        "LRpos": 2.0,
+        "LRneg": 0.5,
+        "note": "Negative strep test supports viral",
+        "source": {
+          "source": "Rapid Strep Test Performance",
+          "year": 2020
+        }
+      },
+      {
+        "target": "throat_culture_negative",
+        "LRpos": 3.0,
+        "LRneg": 0.3,
+        "note": "Negative culture supports viral",
+        "source": {
+          "source": "Throat Culture Performance",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendations": {
+      "confirmed": "supportive-care",
+      "likely": "supportive-care",
+      "inconclusive": "watchful-waiting"
+    }
+  },
+  {
+    "id": "infectious_mononucleosis",
+    "label": "Infectious mononucleosis",
+    "description": "Viral infection caused by Epstein-Barr virus, characterized by fever, fatigue, and pharyngitis",
+    "priors": {
+      "default": 0.10,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 24 },
+          "prior": 0.25
+        },
+        {
+          "ageRange": { "min": 25, "max": 44 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 45 },
+          "prior": 0.05
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.75,
+      "likely": 0.40,
+      "leadDelta": 0.20
+    },
+    "lrTable": [
+      {
+        "target": "fatigue",
+        "LRpos": 3.0,
+        "LRneg": 0.4,
+        "note": "Marked fatigue is characteristic",
+        "source": {
+          "source": "Mono Clinical Features",
+          "year": 2018
+        }
+      },
+      {
+        "target": "sore_throat_duration",
+        "LRpos": 2.5,
+        "LRneg": 0.6,
+        "note": "Prolonged sore throat duration",
+        "source": {
+          "source": "Mono Clinical Features",
+          "year": 2018
+        }
+      },
+      {
+        "target": "monospot_positive",
+        "LRpos": 15.0,
+        "LRneg": 0.1,
+        "note": "Strong positive predictor",
+        "source": {
+          "source": "Monospot Test Performance",
+          "year": 2019
+        }
+      },
+      {
+        "target": "monospot_negative",
+        "LRpos": 0.1,
+        "LRneg": 15.0,
+        "note": "Strong negative predictor",
+        "source": {
+          "source": "Monospot Test Performance",
+          "year": 2019
+        }
+      },
+      {
+        "target": "rapid_strep_negative",
+        "LRpos": 2.0,
+        "LRneg": 0.5,
+        "note": "Negative strep test supports mono",
+        "source": {
+          "source": "Mono vs Strep Differentiation",
+          "year": 2017
+        }
+      }
+    ],
+    "recommendations": {
+      "confirmed": "supportive-care",
+      "likely": "supportive-care",
+      "inconclusive": "watchful-waiting"
+    }
+  }
+]
