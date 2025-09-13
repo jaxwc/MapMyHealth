@@ -1,0 +1,10 @@
+{
+  "name": "Acute Sore Throat - Adult",
+  "version": "1.0.0",
+  "jurisdiction": "US",
+  "source": {
+    "source": "Clinical Guidelines and Literature Review",
+    "year": 2023,
+    "note": "Educational prototype based on clinical guidelines for adult sore throat evaluation"
+  }
+}
