@@ -8,13 +8,13 @@
  * action trees showing possible outcomes and their resulting states.
  */
 
-import { 
-  Beliefs, 
-  ConditionDef, 
-  ClinicalStateRoot, 
-  StateTree, 
-  RankedAction, 
-  ActionDef, 
+import {
+  Beliefs,
+  ConditionDef,
+  ClinicalStateRoot,
+  StateTree,
+  RankedAction,
+  ActionDef,
   TestPerformanceDef,
   Recommendation,
   StateTransition
@@ -140,16 +140,16 @@ function generateStateLabel(classification: any, conditionDefs: ConditionDef[]):
   const conditionName = topCondition?.label || topConditionId;
   
   switch (label) {
-    case "confirmed":
-      return `${conditionName} (confirmed)`;
+    case "highly-likely":
+      return `${conditionName} (highly likely)`;
     case "likely":
       return `${conditionName} (likely)`;
-    case "inconclusive":
-      if (topProbability > 0.1) {
-        return `Possible ${conditionName}`;
-      } else {
-        return "Diagnosis unclear";
-      }
+    case "unknown":
+      return `Possible ${conditionName}`;
+    case "not-likely":
+      return `${conditionName} unlikely`;
+    case "very-unlikely":
+      return `${conditionName} very unlikely`;
     default:
       return "Diagnosis unclear";
   }
@@ -219,30 +219,20 @@ export function getConditionRankings(
   beliefs: Beliefs, 
   conditionDefs: ConditionDef[], 
   maxCount: number = 5
-): Array<{ id: string; label: string; probability: number; statusLabel: string }> {
+): Array<{ id: string; label: string; probability: number; statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" }> {
   const classification = classify(beliefs, conditionDefs);
-  
+
   return classification.top.slice(0, maxCount).map(([conditionId, probability]) => {
     const condition = conditionDefs.find(c => c.id === conditionId);
     const label = condition?.label || conditionId;
-    
-    // Determine status label based on probability and thresholds
-    let statusLabel: "confirmed" | "likely" | "inconclusive";
+
+    // Determine status by matching probability band
+    let statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" = "unknown";
     if (condition) {
-      if (probability >= condition.thresholds.confirm) {
-        statusLabel = "confirmed";
-      } else if (probability >= condition.thresholds.likely) {
-        // Check lead delta
-        const secondProbability = classification.top.length > 1 ? classification.top[1][1] : 0;
-        const leadDelta = probability - secondProbability;
-        statusLabel = leadDelta >= condition.thresholds.leadDelta ? "likely" : "inconclusive";
-      } else {
-        statusLabel = "inconclusive";
-      }
-    } else {
-      statusLabel = "inconclusive";
+      const matchingBand = condition.probabilityBands.find(b => probability >= b.minInclusive && probability < b.maxExclusive);
+      if (matchingBand) statusLabel = matchingBand.category;
     }
-    
+
     return {
       id: conditionId,
       label,

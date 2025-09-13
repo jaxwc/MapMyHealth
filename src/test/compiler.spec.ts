@@ -25,16 +25,20 @@ describe('Compiler Module', () => {
       label: 'Streptococcal pharyngitis',
       description: 'Bacterial infection',
       priors: { default: 0.15 },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.40,
-        leadDelta: 0.20
-      },
+i      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [],
-      recommendations: {
-        confirmed: 'targeted-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'targeted-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     },
     {
@@ -42,16 +46,20 @@ describe('Compiler Module', () => {
       label: 'Viral pharyngitis',
       description: 'Viral infection',
       priors: { default: 0.70 },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.50,
-        leadDelta: 0.15
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [],
-      recommendations: {
-        confirmed: 'supportive-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'supportive-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     },
     {
@@ -59,16 +67,20 @@ describe('Compiler Module', () => {
       label: 'Infectious mononucleosis',
       description: 'Viral infection',
       priors: { default: 0.10 },
-      thresholds: {
-        confirm: 0.75,
-        likely: 0.40,
-        leadDelta: 0.20
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [],
-      recommendations: {
-        confirmed: 'supportive-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'supportive-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     }
   ];
@@ -155,8 +167,8 @@ describe('Compiler Module', () => {
 
     it('should generate appropriate label for likely diagnosis', () => {
       const likelyBeliefs: Beliefs = {
-        'strep': 0.60, // Above likely threshold (0.40) and lead delta (0.20)
-        'viral': 0.35, // Lead delta = 0.60 - 0.35 = 0.25 > 0.20
+        'strep': 0.70, // In likely range (0.60-0.80)
+        'viral': 0.25,
         'mono': 0.05
       };
 
@@ -167,28 +179,28 @@ describe('Compiler Module', () => {
       expect(rootState.recommendation).toBe('supportive-care');
     });
 
-    it('should generate appropriate label for confirmed diagnosis', () => {
-      const confirmedBeliefs: Beliefs = {
-        'strep': 0.85, // Above confirm threshold (0.80)
+    it('should generate appropriate label for highly-likely diagnosis', () => {
+      const highlyLikelyBeliefs: Beliefs = {
+        'strep': 0.85, // Above highly-likely threshold (0.80)
         'viral': 0.10,
         'mono': 0.05
       };
 
-      const rootState = compileState(confirmedBeliefs, mockConditions);
+      const rootState = compileState(highlyLikelyBeliefs, mockConditions);
 
       expect(rootState.label).toContain('Streptococcal pharyngitis');
-      expect(rootState.label).toContain('confirmed');
+      expect(rootState.label).toContain('highly likely');
       expect(rootState.recommendation).toBe('targeted-care');
     });
 
-    it('should generate appropriate label for inconclusive diagnosis', () => {
-      const inconclusiveBeliefs: Beliefs = {
-        'strep': 0.45, // Above likely but insufficient lead delta
-        'viral': 0.40, // Lead delta = 0.45 - 0.40 = 0.05 < 0.20
+    it('should generate appropriate label for unknown diagnosis', () => {
+      const unknownBeliefs: Beliefs = {
+        'strep': 0.40, // In unknown range (0.20-0.60)
+        'viral': 0.45,
         'mono': 0.15
       };
 
-      const rootState = compileState(inconclusiveBeliefs, mockConditions);
+      const rootState = compileState(unknownBeliefs, mockConditions);
 
       expect(rootState.recommendation).toBe('watchful-waiting');
     });
@@ -318,7 +330,7 @@ describe('Compiler Module', () => {
         expect(ranking.label).toBeDefined();
         expect(ranking.probability).toBeDefined();
         expect(ranking.statusLabel).toBeDefined();
-        expect(['confirmed', 'likely', 'inconclusive']).toContain(ranking.statusLabel);
+        expect(['highly-likely', 'likely', 'unknown', 'not-likely', 'very-unlikely']).toContain(ranking.statusLabel);
       }
     });
 
@@ -336,17 +348,17 @@ describe('Compiler Module', () => {
       expect(rankings.length).toBeLessThanOrEqual(2);
     });
 
-    it('should assign correct status labels based on thresholds', () => {
-      const confirmedBeliefs: Beliefs = {
-        'strep': 0.85, // Above confirm threshold
+    it('should assign correct status labels based on probability bands', () => {
+      const highlyLikelyBeliefs: Beliefs = {
+        'strep': 0.85, // Above highly-likely threshold
         'viral': 0.10,
         'mono': 0.05
       };
 
-      const rankings = getConditionRankings(confirmedBeliefs, mockConditions, 3);
+      const rankings = getConditionRankings(highlyLikelyBeliefs, mockConditions, 3);
 
       const strepRanking = rankings.find(r => r.id === 'strep');
-      expect(strepRanking?.statusLabel).toBe('confirmed');
+      expect(strepRanking?.statusLabel).toBe('highly-likely');
     });
   });
 

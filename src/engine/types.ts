@@ -41,11 +41,11 @@ export interface ConditionDef {
       prior: number;
     }>;
   };
-  thresholds: {
-    confirm: number;
-    likely: number;
-    leadDelta: number;
-  };
+  probabilityBands: Array<{
+    category: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
+    minInclusive: number;
+    maxExclusive: number;
+  }>;
   lrTable: Array<{
     target: ID; // findingId or bucketId
     LRpos: number;
@@ -53,11 +53,10 @@ export interface ConditionDef {
     note?: string;
     source: SourceMeta;
   }>;
-  recommendations: {
-    confirmed: Recommendation;
-    likely: Recommendation;
-    inconclusive: Recommendation;
-  };
+  recommendationsByBand: Record<
+    "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
+    Recommendation
+  >;
 }
 
 export interface ActionDef {
@@ -163,7 +162,7 @@ export interface Beliefs {
 
 export interface Classification {
   top: Array<[ID, number]>; // [conditionId, probability]
-  label: "confirmed" | "likely" | "inconclusive";
+  label: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
   recommendation: Recommendation;
 }
 
@@ -253,7 +252,7 @@ export interface ConditionRanking {
   id: ID;
   label: string;
   probability: number;
-  statusLabel: "confirmed" | "likely" | "inconclusive";
+  statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
 }
 
 export interface WhyExplanation {

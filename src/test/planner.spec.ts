@@ -122,16 +122,20 @@ describe('Planner Module', () => {
       label: 'Streptococcal pharyngitis',
       description: 'Bacterial infection',
       priors: { default: 0.15 },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.40,
-        leadDelta: 0.20
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [],
-      recommendations: {
-        confirmed: 'targeted-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'targeted-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     },
     {
@@ -139,16 +143,20 @@ describe('Planner Module', () => {
       label: 'Viral pharyngitis',
       description: 'Viral infection',
       priors: { default: 0.70 },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.50,
-        leadDelta: 0.15
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [],
-      recommendations: {
-        confirmed: 'supportive-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'supportive-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     }
   ];

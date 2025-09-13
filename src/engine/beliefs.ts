@@ -7,14 +7,14 @@
  * and handles normalization, demographic priors, and time-dependent test performance.
  */
 
-import { 
-  CaseState, 
-  ConditionDef, 
-  TestPerformanceDef, 
-  Beliefs, 
+import {
+  CaseState,
+  ConditionDef,
+  TestPerformanceDef,
+  Beliefs,
   Classification,
-  Demographics,
-  FindingValue
+  Recommendation,
+  Demographics
 } from './types';
 
 /**
@@ -104,7 +104,8 @@ export function applyEvidence(
       let lr = finding.presence === "present" ? lrRule.LRpos : lrRule.LRneg;
       
       // Apply time-dependent test performance if this is a test finding
-      if (finding.presence !== "unknown" && finding.daysSinceOnset !== undefined) {
+      if (finding.presence === "present" || finding.presence === "absent") {
+        if (finding.daysSinceOnset !== undefined) {
         const testPerfDef = testPerfMap.get(lrRule.target);
         if (testPerfDef?.piecewiseByDaysSinceOnset) {
           const adjustedPerf = getPiecewisePerformance(
@@ -119,8 +120,9 @@ export function applyEvidence(
             lr = ((1 - adjustedPerf.sensitivity) / adjustedPerf.specificity);
           }
         }
+        }
       }
-      
+
       // Update odds
       odds *= lr;
     }
@@ -151,7 +153,7 @@ export function classify(beliefs: Beliefs, conditionDefs: ConditionDef[]): Class
   if (sortedConditions.length === 0) {
     return {
       top: [],
-      label: "inconclusive",
+      label: "unknown" as "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
       recommendation: "watchful-waiting"
     };
   }
@@ -162,39 +164,28 @@ export function classify(beliefs: Beliefs, conditionDefs: ConditionDef[]): Class
   if (!topCondition) {
     return {
       top: sortedConditions.slice(0, 3),
-      label: "inconclusive",
+      label: "unknown" as "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
       recommendation: "watchful-waiting"
     };
   }
   
-  // Determine classification based on thresholds
-  let label: "confirmed" | "likely" | "inconclusive";
-  let recommendation: string;
-  
-  if (topProbability >= topCondition.thresholds.confirm) {
-    label = "confirmed";
-    recommendation = topCondition.recommendations.confirmed;
-  } else if (topProbability >= topCondition.thresholds.likely) {
-    // Check lead delta
-    const secondProbability = sortedConditions.length > 1 ? sortedConditions[1][1] : 0;
-    const leadDelta = topProbability - secondProbability;
-    
-    if (leadDelta >= topCondition.thresholds.leadDelta) {
-      label = "likely";
-      recommendation = topCondition.recommendations.likely;
-    } else {
-      label = "inconclusive";
-      recommendation = topCondition.recommendations.inconclusive;
-    }
-  } else {
-    label = "inconclusive";
-    recommendation = topCondition.recommendations.inconclusive;
+  // Determine classification based on probability bands
+  let label: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" = "unknown";
+  let recommendation: Recommendation = "watchful-waiting";
+
+  const matchingBand = topCondition.probabilityBands.find(b => topProbability >= b.minInclusive && topProbability < b.maxExclusive);
+  if (matchingBand) {
+    label = matchingBand.category;
+    // Use simple recommendation mapping since recommendationsByBand doesn't exist
+    if (label === "highly-likely") recommendation = "targeted-care";
+    else if (label === "likely") recommendation = "supportive-care";
+    else recommendation = "watchful-waiting";
   }
   
   return {
     top: sortedConditions.slice(0, 5), // Top 5 conditions
     label,
-    recommendation: recommendation as any
+    recommendation
   };
 }
 

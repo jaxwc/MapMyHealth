@@ -26,11 +26,13 @@ describe('Beliefs Module', () => {
           }
         ]
       },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.40,
-        leadDelta: 0.20
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [
         {
           target: 'fever',
@@ -47,10 +49,12 @@ describe('Beliefs Module', () => {
           source: { source: 'Test Source', year: 2020 }
         }
       ],
-      recommendations: {
-        confirmed: 'targeted-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'targeted-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     },
     {
@@ -60,11 +64,13 @@ describe('Beliefs Module', () => {
       priors: {
         default: 0.70
       },
-      thresholds: {
-        confirm: 0.80,
-        likely: 0.50,
-        leadDelta: 0.15
-      },
+      probabilityBands: [
+        { category: "very-unlikely", minInclusive: 0.0, maxExclusive: 0.05 },
+        { category: "not-likely", minInclusive: 0.05, maxExclusive: 0.20 },
+        { category: "unknown", minInclusive: 0.20, maxExclusive: 0.60 },
+        { category: "likely", minInclusive: 0.60, maxExclusive: 0.80 },
+        { category: "highly-likely", minInclusive: 0.80, maxExclusive: 1.01 }
+      ],
       lrTable: [
         {
           target: 'cough',
@@ -74,10 +80,12 @@ describe('Beliefs Module', () => {
           source: { source: 'Test Source', year: 2020 }
         }
       ],
-      recommendations: {
-        confirmed: 'supportive-care',
-        likely: 'supportive-care',
-        inconclusive: 'watchful-waiting'
+      recommendationsByBand: {
+        'highly-likely': 'supportive-care',
+        'likely': 'supportive-care',
+        'unknown': 'watchful-waiting',
+        'not-likely': 'watchful-waiting',
+        'very-unlikely': 'watchful-waiting'
       }
     }
   ];
@@ -273,24 +281,24 @@ describe('Beliefs Module', () => {
   });
 
   describe('classify', () => {
-    it('should classify as confirmed when probability exceeds threshold', () => {
+    it('should classify as highly-likely when probability exceeds 0.80', () => {
       const beliefs: Beliefs = {
-        'strep': 0.85, // Above confirm threshold (0.80)
+        'strep': 0.85, // Above highly-likely threshold (0.80)
         'viral': 0.15
       };
 
       const classification = classify(beliefs, mockConditions);
 
-      expect(classification.label).toBe('confirmed');
+      expect(classification.label).toBe('highly-likely');
       expect(classification.recommendation).toBe('targeted-care');
       expect(classification.top[0][0]).toBe('strep');
       expect(classification.top[0][1]).toBeCloseTo(0.85, 2);
     });
 
-    it('should classify as likely when probability exceeds likely threshold and lead delta', () => {
+    it('should classify as likely when probability is in likely range', () => {
       const beliefs: Beliefs = {
-        'strep': 0.50, // Above likely threshold (0.40) and lead delta (0.20)
-        'viral': 0.20  // Lead delta = 0.50 - 0.20 = 0.30 > 0.20
+        'strep': 0.70, // In likely range (0.60-0.80)
+        'viral': 0.30
       };
 
       const classification = classify(beliefs, mockConditions);
@@ -299,15 +307,16 @@ describe('Beliefs Module', () => {
       expect(classification.recommendation).toBe('supportive-care');
     });
 
-    it('should classify as inconclusive when lead delta is insufficient', () => {
+    it('should classify as unknown when probability is in unknown range', () => {
       const beliefs: Beliefs = {
-        'strep': 0.50, // Above likely threshold but...
-        'viral': 0.40  // Lead delta = 0.50 - 0.40 = 0.10 < 0.20
+        'strep': 0.50, // In unknown range (0.20-0.60)
+        'viral': 0.30  // Also in unknown range, but strep is higher
       };
 
       const classification = classify(beliefs, mockConditions);
 
-      expect(classification.label).toBe('inconclusive');
+      // Strep will be top with 0.50 probability, which is in unknown range
+      expect(classification.label).toBe('unknown');
       expect(classification.recommendation).toBe('watchful-waiting');
     });
 
@@ -316,7 +325,7 @@ describe('Beliefs Module', () => {
 
       const classification = classify(beliefs, mockConditions);
 
-      expect(classification.label).toBe('inconclusive');
+      expect(classification.label).toBe('unknown');
       expect(classification.recommendation).toBe('watchful-waiting');
       expect(classification.top).toHaveLength(0);
     });

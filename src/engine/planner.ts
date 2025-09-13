@@ -250,7 +250,7 @@ function shouldStopBranch(
 ): boolean {
   // Check if we have a confirmed diagnosis
   const classification = classify(branch.leafPosteriorPreview, conditionDefs);
-  if (classification.label === "confirmed") {
+  if (classification.label === "highly-likely") {
     return true;
   }
   

@@ -148,10 +148,11 @@ function buildTopPanel(
   
   // Get most informative unknowns
   const informativeUnknowns = mostInformativeUnknowns(
-    beliefs, 
-    contentPack.conditions, 
-    contentPack.findings, 
-    5
+    beliefs,
+    contentPack.conditions,
+    contentPack.findings,
+    5,
+    caseState
   ).map(unknown => ({
     findingId: unknown.findingId,
     label: contentPack.findings.find((f: FindingDef) => f.id === unknown.findingId)?.label || unknown.findingId,
@@ -286,8 +287,8 @@ function getKnownFindings(
  * @returns Certainty delta
  */
 function calculateCertaintyDelta(before: any, after: any): number {
-  const top1Before = Math.max(...Object.values(before));
-  const top1After = Math.max(...Object.values(after));
+  const top1Before = Math.max(...Object.values(before) as number[]);
+  const top1After = Math.max(...Object.values(after) as number[]);
   return top1After - top1Before;
 }
 

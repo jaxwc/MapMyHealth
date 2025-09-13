@@ -34,11 +34,12 @@ export function mostInformativeUnknowns(
   beliefs: Beliefs,
   conditionDefs: ConditionDef[],
   findingDefs: FindingDef[],
-  k: number = 5
+  k: number = 5,
+  caseState?: CaseState
 ): UnknownInfo[] {
-  const unknownFindings = findingDefs.filter(finding => 
-    !beliefs || Object.keys(beliefs).length === 0 || 
-    !hasKnownValue(finding.id, beliefs, conditionDefs)
+  const unknownFindings = findingDefs.filter(finding =>
+    !beliefs || Object.keys(beliefs).length === 0 ||
+    !hasKnownValue(finding.id, beliefs, conditionDefs, caseState)
   );
   
   const scoredUnknowns: UnknownInfo[] = [];
@@ -122,10 +123,16 @@ export function scoreActionVOI(
  * @param conditionDefs - Condition definitions
  * @returns true if the finding has a known value
  */
-function hasKnownValue(findingId: string, beliefs: Beliefs, conditionDefs: ConditionDef[]): boolean {
-  // This is a simplified check - in a real implementation, you'd need to track
-  // which findings have been observed in the case state
-  return false; // For now, assume all findings are unknown
+function hasKnownValue(findingId: string, beliefs: Beliefs, conditionDefs: ConditionDef[], caseState?: CaseState): boolean {
+  // Check if finding exists in the case state
+  if (caseState?.findings) {
+    return caseState.findings.some(finding =>
+      finding.findingId === findingId &&
+      (finding.presence === "present" || finding.presence === "absent")
+    );
+  }
+
+  return false; // If no case state provided, assume unknown
 }
 
 /**
