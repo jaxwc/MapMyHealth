@@ -4,6 +4,7 @@ import { useState } from "react";
 import ChatPanel from "@/components/ChatPanel";
 import DiagramPanel from "@/components/bottom";
 import Top from "@/components/top";
+import Header from "@/components/Header";
 
 export type HealthData = {
   knowns?: string[];
@@ -22,9 +23,11 @@ export default function Home() {
   return (
     <main className="flex flex-col md:flex-row h-screen w-screen bg-slate-900 font-sans p-4 gap-4 overflow-hidden">
 
-
-      <div className="w-full md:w-[400px] md:flex-shrink-0 h-full">
-        <ChatPanel onNewData={handleNewHealthData} />
+      <div className="w-full md:w-[400px] md:flex-shrink-0 h-full flex flex-col">
+        <Header />
+        <div className="flex-1">
+          <ChatPanel onNewData={handleNewHealthData} />
+        </div>
       </div>
 
 

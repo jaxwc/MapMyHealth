@@ -1,3 +1,15 @@
+/**
+ * DEPRECATED: Agent Utility API Route
+ *
+ * This route is no longer used as the primary data source for the UI.
+ * The UI now gets all data from the Zustand health store.
+ *
+ * This route is repurposed for agent-only utilities like:
+ * - Generating treatment recommendations
+ * - Providing rationale text condensing
+ * - Other AI-assisted utilities that don't directly drive UI state
+ */
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
@@ -20,7 +32,7 @@ export async function POST(req: Request) {
     4.  **treatments**: List 2-3 common, general treatment suggestions or next steps.
 
     ALWAYS respond with a valid JSON object in the following format, and nothing else:
-    {
+        {
       "responseText": "A conversational and helpful response for the user.",
       "analysis": {
         "knowns": ["Fact from prompt", "Symptom from prompt"],

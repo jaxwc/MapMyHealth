@@ -120,6 +120,7 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
         MapMyHealth
       </h2>
 
+
       <div className="flex-grow overflow-y-auto mb-4 pr-2">
         {messages.map((msg, index) => (
           <div
