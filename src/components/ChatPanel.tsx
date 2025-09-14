@@ -45,6 +45,7 @@ export default function ChatPanel({}: ChatPanelProps) {
   const addFindingStore = useHealthStore(state => state.addFinding);
   const removeFindingStore = useHealthStore(state => state.removeFinding);
   const applyActionOutcomeStore = useHealthStore(state => state.applyActionOutcome);
+  const replaceAll = useHealthStore(state => (state as any).replaceAll);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -200,6 +201,26 @@ export default function ChatPanel({}: ChatPanelProps) {
     <div className="flex flex-col h-full min-h-0 bg-slate-800 rounded-xl border border-pink-500/30 shadow-lg shadow-pink-500/10 p-6">
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <h2 className="text-2xl font-bold text-slate-100">Assistant</h2>
+        <Button
+          variant="outline"
+          className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600 h-8 px-3 text-xs"
+          onClick={async () => {
+            try {
+              const res = await fetch('/api/state/mutate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ op: 'resetAll' })
+              });
+              const snapshot = await res.json();
+              replaceAll(snapshot);
+              setMessages([{ sender: 'ai', text: 'New conversation started. How can I help you today?' }]);
+            } catch (e) {
+              console.error('New conversation reset failed', e);
+            }
+          }}
+        >
+          New Conversation
+        </Button>
       </div>
 
 

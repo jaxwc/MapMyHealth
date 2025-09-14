@@ -197,14 +197,31 @@ export default function Top() {
 
   // Store actions
   const init = useHealthStore(state => state.init);
-  const addFinding = useHealthStore(state => state.addFinding);
-  const removeFinding = useHealthStore(state => state.removeFinding);
+  const replaceAll = useHealthStore(state => (state as any).replaceAll);
   const getActionOutcomes = useHealthStore(state => state.getActionOutcomes);
   const applyActionOutcome = useHealthStore(state => state.applyActionOutcome);
   const clearTreatmentRecommendation = useHealthStore(state => state.clearTreatmentRecommendation);
   const setTreatmentRecommendation = useHealthStore(state => state.setTreatmentRecommendation);
 
   const hasPresentFindings = knownFindings.some(f => f.presence === 'present');
+
+  // Hydrate client store from server snapshot on app reload
+  useEffect(() => {
+    const hydrate = async () => {
+      try {
+        const res = await fetch('/api/state', { cache: 'no-store' });
+        if (!res.ok) return;
+        const snapshot = await res.json();
+        if (snapshot && typeof snapshot === 'object') {
+          replaceAll(snapshot);
+        }
+      } catch (e) {
+        console.warn('Hydration from /api/state failed', e);
+      }
+    };
+    hydrate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Content pack: all findings for "+" dropdown
   const [allFindings, setAllFindings] = useState<Array<{ id: string; label?: string }>>([]);
@@ -250,7 +267,17 @@ export default function Top() {
   const selectedActionOutcomes = selectedAction ? getActionOutcomes(selectedAction) : null;
   const handleApplyAction = async () => {
     if (!selectedAction || !selectedOutcome) return;
-    await applyActionOutcome(selectedAction, selectedOutcome);
+    try {
+      const res = await fetch('/api/state/mutate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ op: 'applyActionOutcome', payload: { actionId: selectedAction, outcomeId: selectedOutcome } })
+      });
+      const snapshot = await res.json();
+      replaceAll(snapshot);
+    } catch (e) {
+      console.error('Server applyActionOutcome failed', e);
+    }
     setSelectedAction(null);
     setSelectedOutcome(null);
   };
@@ -335,7 +362,19 @@ export default function Top() {
                 key={`${finding.id}-${i}`}
                 text={finding.id}
                 variant="present"
-                onRemove={() => removeFinding(finding.id)}
+                onRemove={async () => {
+                  try {
+                    const res = await fetch('/api/state/mutate', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ op: 'removeFinding', payload: { id: finding.id } })
+                    });
+                    const snapshot = await res.json();
+                    replaceAll(snapshot);
+                  } catch (e) {
+                    console.error('Server removeFinding failed', e);
+                  }
+                }}
               />
             ))}
             {knownFindings.filter(f => f.presence === 'present').length === 0 && (
@@ -370,7 +409,19 @@ export default function Top() {
                   .map((f) => (
                     <DropdownMenuItem
                       key={f.id}
-                      onClick={() => addFinding({ id: f.id, presence: 'present', source: 'user' })}
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/state/mutate', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ op: 'addFinding', payload: { id: f.id, presence: 'present', source: 'user' } })
+                          });
+                          const snapshot = await res.json();
+                          replaceAll(snapshot);
+                        } catch (e) {
+                          console.error('Server addFinding failed', e);
+                        }
+                      }}
                       className="cursor-pointer"
                     >
                       {f.label || f.id}

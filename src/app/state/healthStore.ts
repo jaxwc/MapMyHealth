@@ -110,6 +110,30 @@ export const useHealthStore = create<HealthStore>()(
 
     // Store actions
     const actions: HealthCommands = {
+      replaceAll: (next: HealthState) => {
+        // Replace the entire client-side mirror with a server snapshot
+        set({
+          knownFindings: next.knownFindings || [],
+          rankedConditions: next.rankedConditions || [],
+          importantUnknowns: next.importantUnknowns || [],
+          actionMap: next.actionMap || initialState.actionMap,
+          actionRanking: next.actionRanking || [],
+          patientData: next.patientData || null,
+          treatmentRecommendation: next.treatmentRecommendation,
+          lastEvaluatedAt: next.lastEvaluatedAt,
+          triage: next.triage,
+          engineRecommendation: next.engineRecommendation,
+          escalationResult: (next as any).escalationResult,
+          costWeights: next.costWeights || DEFAULT_COST_WEIGHTS,
+          completedActions: next.completedActions || [],
+        });
+      },
+
+      resetAll: async () => {
+        // Reset to initial state on server and recompute for a clean baseline
+        set({ ...initialState });
+        await recompute();
+      },
       init: async (patientId?: string) => {
         if (patientId) {
           try {
