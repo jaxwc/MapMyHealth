@@ -1,0 +1,52 @@
+[
+  {
+    "id": "rapid_strep_performance",
+    "testId": "rapid_strep_test",
+    "sensitivity": 0.85,
+    "specificity": 0.95,
+    "source": {
+      "source": "Rapid Strep Test Meta-analysis",
+      "year": 2020,
+      "note": "Pooled sensitivity and specificity from multiple studies"
+    }
+  },
+  {
+    "id": "throat_culture_performance",
+    "testId": "throat_culture",
+    "sensitivity": 0.95,
+    "specificity": 0.98,
+    "source": {
+      "source": "Throat Culture Performance Review",
+      "year": 2019,
+      "note": "Gold standard for group A strep detection"
+    }
+  },
+  {
+    "id": "monospot_performance",
+    "testId": "monospot_test",
+    "sensitivity": 0.85,
+    "specificity": 0.95,
+    "piecewiseByDaysSinceOnset": [
+      {
+        "daysRange": { "min": 0, "max": 3 },
+        "sensitivity": 0.70,
+        "specificity": 0.95
+      },
+      {
+        "daysRange": { "min": 4, "max": 7 },
+        "sensitivity": 0.85,
+        "specificity": 0.95
+      },
+      {
+        "daysRange": { "min": 8 },
+        "sensitivity": 0.90,
+        "specificity": 0.95
+      }
+    ],
+    "source": {
+      "source": "Monospot Test Performance Study",
+      "year": 2019,
+      "note": "Sensitivity varies by time since onset of symptoms"
+    }
+  }
+]

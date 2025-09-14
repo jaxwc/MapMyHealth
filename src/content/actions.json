@@ -1,0 +1,220 @@
+[
+  {
+    "id": "rapid_strep_test",
+    "label": "Rapid strep test",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["sore_throat"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 25,
+      "timeHours": 0.5,
+      "difficulty": 1,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "rapid_strep_positive",
+      "findingIdNegative": "rapid_strep_negative",
+      "performanceRefId": "rapid_strep_performance"
+    },
+    "outcomes": [
+      {
+        "id": "rapid_strep_positive",
+        "label": "Rapid strep test positive",
+        "probabilityHint": 0.3,
+        "effects": [
+          {
+            "findingId": "rapid_strep_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "rapid_strep_negative",
+        "label": "Rapid strep test negative",
+        "probabilityHint": 0.7,
+        "effects": [
+          {
+            "findingId": "rapid_strep_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "throat_culture",
+    "label": "Throat culture",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["sore_throat"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 45,
+      "timeHours": 1,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "throat_culture_positive",
+      "findingIdNegative": "throat_culture_negative",
+      "performanceRefId": "throat_culture_performance"
+    },
+    "outcomes": [
+      {
+        "id": "throat_culture_positive",
+        "label": "Throat culture positive",
+        "probabilityHint": 0.2,
+        "effects": [
+          {
+            "findingId": "throat_culture_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "throat_culture_negative",
+        "label": "Throat culture negative",
+        "probabilityHint": 0.8,
+        "effects": [
+          {
+            "findingId": "throat_culture_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "monospot_test",
+    "label": "Monospot test",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["sore_throat"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 35,
+      "timeHours": 1,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "monospot_positive",
+      "findingIdNegative": "monospot_negative",
+      "performanceRefId": "monospot_performance"
+    },
+    "outcomes": [
+      {
+        "id": "monospot_positive",
+        "label": "Monospot test positive",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "monospot_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "monospot_negative",
+        "label": "Monospot test negative",
+        "probabilityHint": 0.85,
+        "effects": [
+          {
+            "findingId": "monospot_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wait_observe_48h",
+    "label": "Wait & observe 48 hours",
+    "kind": "WaitObserve",
+    "preconditions": {
+      "requireFindings": [],
+      "forbidFindings": ["drooling", "stridor", "neck_swelling_fever"],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 0,
+      "timeHours": 48,
+      "difficulty": 1,
+      "risk": 1
+    },
+    "waitBinding": {
+      "hours": 48,
+      "outcomes": ["improving", "worse", "no_change"],
+      "findingEffectsByOutcome": {
+        "improving": [
+          {
+            "findingId": "sore_throat",
+            "presence": "absent"
+          }
+        ],
+        "worse": [
+          {
+            "findingId": "sore_throat",
+            "presence": "present"
+          },
+          {
+            "findingId": "fever",
+            "presence": "present"
+          }
+        ],
+        "no_change": [
+          {
+            "findingId": "sore_throat",
+            "presence": "present"
+          }
+        ]
+      }
+    },
+    "outcomes": [
+      {
+        "id": "improving",
+        "label": "Symptoms improving",
+        "probabilityHint": 0.6,
+        "effects": [
+          {
+            "findingId": "sore_throat",
+            "presence": "absent"
+          }
+        ]
+      },
+      {
+        "id": "worse",
+        "label": "Symptoms worse",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "sore_throat",
+            "presence": "present"
+          },
+          {
+            "findingId": "fever",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "no_change",
+        "label": "No change in symptoms",
+        "probabilityHint": 0.25,
+        "effects": [
+          {
+            "findingId": "sore_throat",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  }
+]
