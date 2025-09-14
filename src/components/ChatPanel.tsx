@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useRef, useEffect } from 'react';
+import { useHealthStore } from '@/app/state/healthStore';
 // Remove unused import - ChatPanel will work with store directly
 import { SendHorizonal } from 'lucide-react';
 import { Button } from './ui/button';
@@ -38,6 +39,7 @@ export default function ChatPanel({}: ChatPanelProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const streamMsgIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,19 +56,101 @@ export default function ChatPanel({}: ChatPanelProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/agent/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: currentInput }),
       });
 
-      if (!response.ok) {
+      if (!response.ok || !response.body) {
         throw new Error("API request failed");
       }
 
-      const data = await response.json();
-      const aiMessage: Message = { sender: "ai", text: data.responseText };
-      setMessages((prev) => [...prev, aiMessage]);
+      // Stream JSONL lines: {type: 'text'|'breadcrumb'|'done'|'error', data}
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let aggregated = '';
+
+      const pushAIText = (text: string) => {
+        setMessages((prev) => {
+          const updated = [...prev];
+          if (streamMsgIndexRef.current != null && updated[streamMsgIndexRef.current]) {
+            updated[streamMsgIndexRef.current] = { sender: 'ai', text: `__STREAM__${aggregated}` };
+            return updated;
+          }
+          // create a new streaming message and remember its index
+          updated.push({ sender: 'ai', text: `__STREAM__${aggregated}` });
+          streamMsgIndexRef.current = updated.length - 1;
+          return updated;
+        });
+      };
+
+      // Show breadcrumbs as small system messages
+      const pushBreadcrumb = (label: string) => {
+        setMessages((prev) => [...prev, { sender: 'ai', text: `[${label}]` }]);
+      };
+
+      const pushUI = (ui: any) => {
+        // Simple placeholder: serialize UI blocks into the chat stream.
+        // Future: render dedicated components for condition/action cards & mermaid.
+        const tag = ui?.ui === 'mermaid' ? 'Mermaid' : 'UI';
+        const content = ui?.definition ?? JSON.stringify(ui);
+        setMessages((prev) => [...prev, { sender: 'ai', text: `${tag}:\n${content}` }]);
+      };
+
+      const mirrorLocalFinding = (args: any) => {
+        try {
+          if (!args?.id || !args?.presence) return;
+          // Optimistic echo in chat; real state comes from store recompute after tool finishes.
+          setMessages((prev) => [...prev, { sender: 'ai', text: `(noted) finding ${args.id}: ${args.presence}` }]);
+        } catch {}
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let idx;
+        while ((idx = buffer.indexOf('\n')) >= 0) {
+          const line = buffer.slice(0, idx).trim();
+          buffer = buffer.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const evt = JSON.parse(line);
+            if (evt.type === 'text') {
+              aggregated += evt.data;
+              pushAIText(evt.data);
+            } else if (evt.type === 'breadcrumb') {
+              const phase = evt.data?.phase;
+              const toolName = evt.data?.toolName;
+              pushBreadcrumb(`${phase}: ${toolName}`);
+            } else if (evt.type === 'done') {
+              // Replace the tracked streaming message with final text when possible
+              setMessages((prev) => {
+                const updated = [...prev];
+                const idx = streamMsgIndexRef.current;
+                if (idx != null && updated[idx]) {
+                  updated[idx] = { sender: 'ai', text: evt.data };
+                } else {
+                  updated.push({ sender: 'ai', text: evt.data });
+                }
+                streamMsgIndexRef.current = null;
+                return updated;
+              });
+            } else if (evt.type === 'ui') {
+              pushUI(evt.data);
+            } else if (evt.type === 'tool') {
+              if (evt.data?.toolName === 'addFinding') mirrorLocalFinding(evt.data?.args);
+            } else if (evt.type === 'tool-result') {
+              // Optional: could reconcile any final state visualization here.
+              // Keep UI reactive to store; do not maintain a parallel state in chat.
+            } else if (evt.type === 'error') {
+              pushBreadcrumb(`error: ${evt.data}`);
+            }
+          } catch {}
+        }
+      }
 
       // TODO: Use health store to update findings based on chat analysis
       // For now, remove this call since we use store-based architecture

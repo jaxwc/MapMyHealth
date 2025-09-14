@@ -315,7 +315,10 @@ export class EngineFacadeImpl implements EngineFacade {
  */
 async function loadContentPack(): Promise<ContentPack> {
   try {
-    const response = await fetch('/api/content-pack');
+    // Use absolute URL on server; relative on client
+    const isServer = typeof window === 'undefined';
+    const base = isServer ? (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000') : '';
+    const response = await fetch(`${base}/api/content-pack`);
     if (!response.ok) {
       throw new Error(`Failed to load content pack: ${response.status}`);
     }
