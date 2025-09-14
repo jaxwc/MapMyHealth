@@ -1,6 +1,5 @@
 import React from "react";
 
-
 export interface HealthData {
   knowns?: string[];
   unknowns?: string[];
@@ -19,19 +18,27 @@ interface DiagramPanelProps {
 }
 
 export default function DiagramPanel({ data }: DiagramPanelProps) {
+  const containerClasses =
+    "h-full w-full rounded-xl border border-pink-500/30 bg-slate-800 px-8 pt-8 pb-4 flex flex-col justify-start overflow-y-auto";
+
+
+  const headerClasses = "text-xl font-bold text-slate-100 mb-8 self-start";
+
   if (!data || !data.conditions || data.conditions.length === 0) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-xl border border-pink-500/30 bg-slate-800 p-8">
-        <p className="text-lg text-slate-500">
-          Health graph will appear here...
-        </p>
+      <div className={`${containerClasses}`}>
+
+        <h2 className={headerClasses}>Health State</h2>
       </div>
     );
   }
 
   return (
-    <div className="h-full w-full rounded-xl border border-pink-500/30 bg-slate-800 p-8 overflow-y-auto">
-      <div className="flex flex-col items-center space-y-12">
+    <div className={containerClasses}>
+
+      <h2 className={headerClasses}>Health State</h2>
+
+      <div className="flex flex-col items-center space-y-12 w-full flex-grow">
         <Node title="Health State" />
 
         <div className="flex flex-wrap justify-center gap-6">

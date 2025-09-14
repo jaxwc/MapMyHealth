@@ -22,18 +22,18 @@ export default function Top({ data }: TopPanelProps) {
   if (!data) {
     return (
       <div className="flex h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-8 items-start justify-start">
-        <h3 className="text-xl font-bold text-slate-100 flex-shrink-0">
+        <h2 className="text-xl font-bold text-slate-100 flex-shrink-0">
           Analysis Summary
-        </h3>
+        </h2>
       </div>
     );
   }
 
   return (
     <div className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6 flex flex-col space-y-3 overflow-y-auto">
-      <h3 className="text-xl font-bold text-slate-100 flex-shrink-0">
+      <h2 className="text-xl font-bold text-slate-100 flex-shrink-0">
         Analysis Summary
-      </h3>
+      </h2>
 
       <div className="flex flex-col md:flex-row gap-4">
         {data.knowns && data.knowns.length > 0 && (
