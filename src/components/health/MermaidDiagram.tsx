@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; definition?: string }) {
   const mermaidRef = useRef<HTMLDivElement>(null);
@@ -191,9 +192,16 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
   }, [actionMap, diagramId, definition]);
 
   return (
-    <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] overflow-auto w-full">
-      <div ref={mermaidRef} className="mermaid-diagram" />
-    </div>
+    <ScrollArea className="w-full max-w-full">
+      <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] w-full max-w-full">
+        {/* Ensure content can overflow in both directions for scrolling */}
+        <div className="min-w-[720px] min-h-[240px]">
+          <div ref={mermaidRef} className="mermaid-diagram" />
+        </div>
+      </div>
+      <ScrollBar orientation="horizontal" />
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 }
 

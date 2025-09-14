@@ -2,7 +2,7 @@ import { Agent } from '@mastra/core/agent';
 import { google } from '@ai-sdk/google';
 import { bridgeReadTools } from '../tools/bridge-read';
 import { bridgeWriteTools } from '../tools/bridge-write';
-import { externalSearchTool } from '../tools/external-search';
+import { externalSearchTool } from '@/mastra/tools/external-search';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 
@@ -43,6 +43,14 @@ How to use the tools (always prefer these over assumptions):
 - addFinding/removeFinding/updatePatientData → reflect user-provided details; keep changes minimal and explain what changed.
 - externalSearch(query) → when engine certainty is low or the user asks for references; prefer reputable, health-authority sources and summarize cautiously.
 
+Mermaid diagrams (improve render reliability and clarity):
+- Prefer compact, single-line flow definitions using either "graph TD;" or "flowchart TD;" with short node IDs (A, B, C...) and labeled nodes like A[\"Wait & observe 48h\"].
+- Use only safe characters inside labels. Avoid square brackets and quotes inside labels; if needed, escape quotes as \\\".
+- Keep graphs shallow and narrow in chat (<= 7 nodes wide). Use multiple smaller graphs instead of one huge one.
+- Example starter template you can adapt:
+  {"ui":"mermaid","definition":"flowchart TD; START[\"Current state\"]-->A{\"Rapid strep test\"}; A-->P[\"Positive (30%)\"]; A-->N[\"Negative (70%)\"]; START-->B{\"Monospot test\"}; B-->BP[\"Positive (30%)\"]; B-->BN[\"Negative (70%)\"]"}
+- Always introduce the diagram with a brief explanation of what it shows and how to read it.
+
 Planning and explanation guidelines:
 - Start from triage. If urgent, keep planning succinct and emphasize care seeking.
 - If not urgent: (1) summarize likely conditions and uncertainties, (2) propose the top 1–3 actions from the recommender, (3) explain why they reduce uncertainty or help decision-making.
@@ -55,7 +63,7 @@ Planning and explanation guidelines:
 Inline visualization cues (the UI may render these when present in your final response):
 - To reference a condition card: emit a single line JSON block like {"ui":"condition-card","conditionId":"CONDITION_ID"}.
 - To reference an action card: {"ui":"action-card","actionId":"ACTION_ID"}.
-- To propose a flow diagram: {"ui":"mermaid","definition":"graph TD; A[Current]-->B{Action}; B-->C[Outcome 1]; B-->D[Outcome 2];"}.
+- To show the current action map from the system, emit {"ui":"action-map"}. Do not attempt to craft Mermaid yourself; the UI renders the authoritative map from HealthState. Use readActionMap to discuss it.
 Include a brief natural-language explanation before or after these cues so the user understands what they’re seeing. Do not overuse visuals; include them only when they materially aid understanding or decision-making.
 `,
   model: google('gemini-2.5-flash'),

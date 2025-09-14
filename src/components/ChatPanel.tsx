@@ -49,6 +49,7 @@ export default function ChatPanel({}: ChatPanelProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamMsgIndexRef = useRef<number | null>(null);
+  const rehydrateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Server-authoritative sync helpers
   const replaceAll = useHealthStore(state => (state as any).replaceAll);
@@ -110,6 +111,8 @@ export default function ChatPanel({}: ChatPanelProps) {
               return 'Removing finding...';
             case 'applyActionOutcome':
               return 'Applying action outcome...';
+            case 'takeAction':
+              return 'Recording action and outcome...';
             case 'setPatientData':
               return 'Updating patient data...';
             case 'resetAll':
@@ -152,6 +155,10 @@ export default function ChatPanel({}: ChatPanelProps) {
         }
         if (ui?.ui === 'mermaid') {
           return <MermaidDiagram definition={ui.definition} />;
+        }
+        if (ui?.ui === 'action-map') {
+          const actionMap = useStore.getState().actionMap;
+          return <MermaidDiagram actionMap={actionMap} />;
         }
         return <div className="text-slate-300 text-xs">{JSON.stringify(ui)}</div>;
       };
@@ -248,16 +255,25 @@ export default function ChatPanel({}: ChatPanelProps) {
       };
 
       const reconcileToolResult = async () => {
-        // Server-authoritative: fetch latest snapshot and replace local state
-        try {
-          const res = await fetch('/api/state', { cache: 'no-store' });
-          if (res.ok) {
+        // Debounce and version-guarded rehydration to avoid overwriting newer client state
+        if (rehydrateTimeoutRef.current) clearTimeout(rehydrateTimeoutRef.current);
+        rehydrateTimeoutRef.current = setTimeout(async () => {
+          try {
+            const res = await fetch('/api/state', { cache: 'no-store' });
+            if (!res.ok) return;
             const snapshot = await res.json();
-            replaceAll(snapshot);
+            const incomingVersion = Number((snapshot as any)?.stateVersion ?? 0);
+            const currentVersion = Number(stateVersion ?? 0);
+            if (!Number.isNaN(incomingVersion) && incomingVersion >= currentVersion) {
+              replaceAll(snapshot);
+            } else {
+              // Skip stale snapshot
+              console.debug('[ChatPanel] Skipped stale snapshot', { incomingVersion, currentVersion });
+            }
+          } catch (err) {
+            console.warn('[ChatPanel] Failed to hydrate after tool-result', err);
           }
-        } catch (err) {
-          console.warn('[ChatPanel] Failed to hydrate after tool-result', err);
-        }
+        }, 120);
       };
 
       while (true) {
@@ -303,7 +319,13 @@ export default function ChatPanel({}: ChatPanelProps) {
               });
             } else if (evt.type === 'ui') {
               // Inline UI updates outside of final message: show as its own bubble
-              const jsx = <div className="space-y-3">{renderUI(evt.data)}</div>;
+              let jsxNode: React.ReactNode = renderUI(evt.data);
+              if (evt.data?.ui === 'action-map') {
+                // Render the same analysis view diagram from current HealthState
+                const actionMap = useStore.getState().actionMap;
+                jsxNode = <MermaidDiagram actionMap={actionMap} />;
+              }
+              const jsx = <div className="space-y-3">{jsxNode}</div>;
               setMessages((prev) => [...prev, { sender: 'ai', text: '', jsx } as any]);
             } else if (evt.type === 'tool') {
               // no-op; avoid noisy local echoes

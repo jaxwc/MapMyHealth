@@ -83,54 +83,12 @@ export const readActionMap = createTool({
   execute: async () => ({ map: AgentBridge.readActionMap() }),
 });
 
-export const renderActionGraphMermaid = createTool({
-  id: 'renderActionGraphMermaid',
-  description: 'Generates a Mermaid graph definition for the current action map for inline chat rendering.',
-  inputSchema: z.object({ includeProbabilities: z.boolean().optional() }).optional(),
-  outputSchema: z.object({ ui: z.literal('mermaid'), definition: z.string() }),
-  execute: async ({ context }) => {
-    const map: any = AgentBridge.readActionMap();
-    const catalog = map?.catalog ?? {};
-    const transitions = map?.transitions ?? [];
-    const includeProb = !!context?.includeProbabilities;
-    const lines: string[] = ['graph TD', '  START[Current state]'];
-    const seenNodes = new Set<string>();
-
-    for (const t of transitions) {
-      const actionId = String(t.actionId);
-      const actionLabel = String(t.actionLabel ?? actionId);
-      const actionNode = `A_${actionId}`;
-      if (!seenNodes.has(actionNode)) {
-        lines.push(`  ${actionNode}[${actionLabel}]`);
-        seenNodes.add(actionNode);
-      }
-      lines.push(`  START-->${actionNode}`);
-      for (const o of t.outcomes ?? []) {
-        const outcomeNode = `O_${actionId}_${o.outcomeId}`;
-        const prob = includeProb ? ` (${Math.round((o.probEstimate ?? 0) * 100)}%)` : '';
-        const label = `${o.label}${prob}`;
-        if (!seenNodes.has(outcomeNode)) {
-          lines.push(`  ${outcomeNode}[${label}]`);
-          seenNodes.add(outcomeNode);
-        }
-        lines.push(`  ${actionNode}-->${outcomeNode}`);
-      }
-    }
-
-    // Fall back: if there are no transitions, list catalog actions
-    if (transitions.length === 0 && catalog) {
-      for (const id of Object.keys(catalog)) {
-        const node = `A_${id}`;
-        if (!seenNodes.has(node)) {
-          lines.push(`  ${node}[${catalog[id]?.name ?? id}]`);
-          lines.push(`  START-->${node}`);
-        }
-      }
-    }
-
-    const definition = lines.join('\n');
-    return { ui: 'mermaid', definition } as const;
-  },
+export const renderActionMap = createTool({
+  id: 'renderActionMap',
+  description: 'Requests the UI to render the current action map from HealthState (no custom mermaid).',
+  inputSchema: z.object({}).optional(),
+  outputSchema: z.object({ ui: z.literal('action-map') }),
+  execute: async () => ({ ui: 'action-map' as const }),
 });
 
 export const readConditionInformation = createTool({
@@ -151,7 +109,7 @@ export const bridgeReadTools = {
   readActionRanking,
   readActionMap,
   readConditionInformation,
-  renderActionGraphMermaid,
+  renderActionMap,
 };
 
 
