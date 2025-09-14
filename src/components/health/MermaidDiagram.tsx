@@ -29,7 +29,31 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
           } as any,
         });
 
-        let mermaidSyntax = definition || '';
+        const normalizeDefinition = (raw: string) => {
+          if (!raw) return '';
+          let s = String(raw).trim();
+          // If previous fallback text was embedded, strip it and take the actual graph
+          const idxFallback = s.indexOf('Could not render diagram. Showing definition:');
+          if (idxFallback >= 0) {
+            const rest = s.slice(idxFallback + 'Could not render diagram. Showing definition:'.length).trim();
+            s = rest;
+          }
+          // Remove surrounding code fences if present
+          if (s.startsWith('```')) {
+            // try to extract fenced content
+            const m = s.match(/```(?:mermaid)?[\r\n]+([\s\s\S]*?)```/);
+            if (m && m[1]) s = m[1].trim();
+          }
+          // Convert escaped newlines to real newlines
+          s = s.replaceAll('\\n', '\n').replaceAll('\r\n', '\n');
+          // Trim any stray quotes around the entire string
+          if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+            s = s.slice(1, -1);
+          }
+          return s.trim();
+        };
+
+        let mermaidSyntax = definition ? normalizeDefinition(definition) : '';
         if (!mermaidSyntax && actionMap?.transitions?.length) {
           const sanitize = (label: string) =>
             String(label)

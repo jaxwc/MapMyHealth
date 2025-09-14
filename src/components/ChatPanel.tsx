@@ -166,17 +166,35 @@ export default function ChatPanel({}: ChatPanelProps) {
         const segments: Array<{ type: 'markdown' | 'ui'; value: any }> = [];
         if (!text) return segments;
 
-        // First, extract mermaid code blocks ```mermaid ... ```
-        const mermaidRegex = /```mermaid[\r\n]+([\s\S]*?)```/g;
+        // First, extract mermaid code blocks ```mermaid ... ``` or bare ``` ... ``` that begin with graph/flowchart
+        const mermaidRegex = /```(?:mermaid)?[\r\n]+([\s\S]*?)```/g;
         let remaining = text;
         let m: RegExpExecArray | null;
         while ((m = mermaidRegex.exec(text)) !== null) {
           const before = remaining.slice(0, remaining.indexOf(m[0]));
           if (before) segments.push({ type: 'markdown', value: before });
-          segments.push({ type: 'ui', value: { ui: 'mermaid', definition: m[1] } });
+          const def = (m[1] || '').trim();
+          if (/^(graph|flowchart)\s+/i.test(def)) {
+            segments.push({ type: 'ui', value: { ui: 'mermaid', definition: def } });
+          } else {
+            // not a mermaid block, keep as markdown
+            segments.push({ type: 'markdown', value: '```\n' + def + '\n```' });
+          }
           remaining = remaining.slice(remaining.indexOf(m[0]) + m[0].length);
         }
         text = remaining;
+
+        // If no fenced block, support simple inline mermaid starting with `graph` or `flowchart`
+        if (!/```mermaid/.test(remaining)) {
+          const startIdx = remaining.search(/\b(graph|flowchart)\s+(TD|TB|LR|RL|BT)\b/i);
+          if (startIdx >= 0) {
+            const before = remaining.slice(0, startIdx);
+            const mermaidDef = remaining.slice(startIdx).trim();
+            if (before) segments.push({ type: 'markdown', value: before });
+            segments.push({ type: 'ui', value: { ui: 'mermaid', definition: mermaidDef } });
+            return segments;
+          }
+        }
 
         // Then, detect inline JSON UI tokens like {"ui":"condition-card",...}
         // We'll scan for occurrences of {"ui": and try to parse minimal JSON blocks.
