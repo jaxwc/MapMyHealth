@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -55,7 +57,7 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
         };
 
         let mermaidSyntax = definition ? normalizeDefinition(definition) : '';
-        if (!mermaidSyntax && actionMap?.transitions?.length) {
+        if (!mermaidSyntax && actionMap) {
           const sanitize = (label: string) =>
             String(label)
               .replaceAll('"', '\\"')
@@ -64,7 +66,7 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
 
           mermaidSyntax = 'flowchart TD\n';
           mermaidSyntax += `  Start["${sanitize(actionMap.root.label)}"]\n`;
-          actionMap.transitions.forEach((transition: any, index: number) => {
+          (actionMap.transitions || []).forEach((transition: any, index: number) => {
             const actionId = `A${index}`;
             mermaidSyntax += `  ${actionId}["${sanitize(transition.actionLabel)}"]\n`;
             mermaidSyntax += `  Start --> ${actionId}\n`;
@@ -81,11 +83,26 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
           });
         }
 
-        if (!mermaidSyntax) return;
+        if (!mermaidSyntax) {
+          // Graceful placeholder if no diagram content
+          if (mermaidRef.current) {
+            const count = actionMap?.transitions?.length || 0;
+            mermaidRef.current.innerHTML = `
+              <div class="text-center text-slate-400 py-8">
+                <p>${count > 0 ? 'Unable to render action diagram.' : 'No recommended actions available for current state.'}</p>
+              </div>
+            `;
+          }
+          return;
+        }
 
         // Pre-validate to catch parse errors early and show a graceful fallback
         try {
-          await (mermaid as unknown as { parse: (s: string) => Promise<void> }).parse(mermaidSyntax);
+          // mermaid.parse may be sync in some versions; normalize
+          const parsed = (mermaid as any).parse(mermaidSyntax);
+          if (parsed && typeof parsed.then === 'function') {
+            await parsed;
+          }
         } catch (parseErr) {
           console.warn('Mermaid parse error. Showing fallback.', parseErr);
           mermaidRef.current.innerHTML = `
@@ -100,7 +117,16 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
         }
 
         mermaidRef.current.innerHTML = '';
-        const { svg } = await mermaid.render(diagramId, mermaidSyntax);
+        const rendered = await mermaid.render(diagramId, mermaidSyntax);
+        const svg = (rendered as any)?.svg || rendered;
+        if (!svg) {
+          mermaidRef.current.innerHTML = `
+            <div class="text-slate-300 text-sm">
+              <div class="mb-2">Diagram renderer returned empty output.</div>
+            </div>
+          `;
+          return;
+        }
         mermaidRef.current.innerHTML = svg;
         const svgElement = mermaidRef.current.querySelector('svg');
         if (svgElement) {
@@ -195,7 +221,7 @@ export function MermaidDiagram({ actionMap, definition }: { actionMap?: any; def
     <ScrollArea className="w-full max-w-full">
       <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] w-full max-w-full">
         {/* Ensure content can overflow in both directions for scrolling */}
-        <div className="min-w-[720px] min-h-[240px]">
+        <div className="min-w-0 min-h-[240px]">
           <div ref={mermaidRef} className="mermaid-diagram" />
         </div>
       </div>
