@@ -23,7 +23,15 @@ export type ConditionId = string;
 export type ActionId = string;
 
 export interface PatientData {
-  demographics?: { age?: number; sexAtBirth?: "male" | "female" | "other" };
+  demographics?: { 
+    age?: number; 
+    sexAtBirth?: "male" | "female" | "other";
+    height?: {
+        feet: number;
+        inches: number;
+    };
+    weight?: number;
+  };
   vitals?: Record<string, number | string>;
   labs?: Record<string, number | string>;
   history?: Record<string, unknown>;

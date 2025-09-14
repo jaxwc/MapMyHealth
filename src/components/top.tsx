@@ -7,6 +7,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  SelectSeparator,
 } from "@/components/ui/select";
 import {
   DropdownMenu,
@@ -25,14 +26,22 @@ import {
   RefreshCw,
   Zap,
   Plus,
-} from "lucide-react";
+  X,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  Wrench,
+  Trash2,
+  Edit,} from "lucide-react";
 import { useHealthStore, selectRankedConditions, selectKnownFindings, selectImportantUnknowns, selectTriage, selectTreatmentRecommendation, selectActionRanking } from "@/app/state/healthStore";
-import { getAvailableMockPatients } from "@/app/services/PatientHealthService";
+import { getAvailableMockPatients, deletePatient } from "@/app/services/PatientHealthService";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { HealthChip } from '@/components/health/HealthChip';
 import { ConditionCard } from '@/components/health/ConditionCard';
 import { ActionCard } from '@/components/health/ActionCard';
 import { MermaidDiagram } from '@/components/health/MermaidDiagram';
+import AddPatientForm from "./AddPatientForm";
+import EditPatientForm from "./EditPatientForm";
 
 // Use shared components instead of local inline UIs
 
@@ -78,6 +87,32 @@ export default function Top() {
   // Content pack: all findings for "+" dropdown
   const [allFindings, setAllFindings] = useState<Array<{ id: string; label?: string }>>([]);
   const [findingFilter, setFindingFilter] = useState("");
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+  const [isEditPatientOpen, setIsEditPatientOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState("patient-001");
+  const [patientListVersion, setPatientListVersion] = useState(0);
+  const [patients, setPatients] = useState(getAvailableMockPatients());
+
+  useEffect(() => {
+    setPatients(getAvailableMockPatients());
+  }, [patientListVersion]);
+
+  const handlePatientAdded = () => {
+    setPatientListVersion(v => v + 1);
+  };
+
+  const handlePatientUpdated = () => {
+    setPatientListVersion(v => v + 1);
+  };
+
+  const handleDeletePatient = () => {
+    if (window.confirm("Are you sure you want to delete this patient?")) {
+      deletePatient(selectedPatient);
+      setPatientListVersion(v => v + 1);
+      setSelectedPatient(getAvailableMockPatients()[0]?.id || "");
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -134,8 +169,12 @@ export default function Top() {
     setSelectedOutcome(null);
   };
 
+  const currentPatient = patients.find(p => p.id === selectedPatient);
+
   return (
     <ScrollArea className="h-full w-full min-w-0 rounded-lg border border-pink-500/30 bg-slate-800 p-6">
+      {isAddPatientOpen && <AddPatientForm onClose={() => setIsAddPatientOpen(false)} onPatientAdded={handlePatientAdded} />}
+      {isEditPatientOpen && currentPatient && <EditPatientForm patient={currentPatient} onClose={() => { setIsEditPatientOpen(false); handlePatientUpdated(); }} />}
       <div className="flex flex-col space-y-9">
         <div className="flex items-center justify-between flex-shrink-0">
           <h3 className="text-xl font-bold text-slate-100">
@@ -144,18 +183,50 @@ export default function Top() {
           {/* Patient Select */}
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-slate-400" />
-            <Select defaultValue="patient-001" onValueChange={(value) => init(value)}>
+            <Select
+              value={selectedPatient}
+              onValueChange={(value) => {
+                if (value === "add-patient") {
+                  setIsAddPatientOpen(true);
+                } else {
+                  setSelectedPatient(value);
+                  init(value);
+                }
+              }}
+            >
               <SelectTrigger className="w-40 bg-slate-700 border-slate-600 text-slate-200">
                 <SelectValue placeholder="Select patient" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 text-slate-200 border-slate-600">
-                {getAvailableMockPatients().map(patient => (
+                {patients.map((patient) => (
                   <SelectItem key={patient.id} value={patient.id}>
                     {patient.name}
                   </SelectItem>
                 ))}
+                <SelectSeparator className="my-1 bg-slate-700" />
+                <SelectItem value="add-patient" className="text-cyan-400 focus:text-cyan-400">
+                    <div className="flex items-center">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add New Patient
+                    </div>
+                </SelectItem>
               </SelectContent>
             </Select>
+            {selectedPatient && (
+              <>
+                <Button variant="outline" size="icon" className="h-9 w-9 bg-slate-700 border-slate-600 text-slate-200" onClick={() => setIsEditPatientOpen(true)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 bg-slate-700 border-slate-600 text-red-400 hover:bg-slate-600 hover:text-red-300"
+                  onClick={handleDeletePatient}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -377,8 +448,9 @@ export default function Top() {
             {actionRanking.slice(0, 5).map((action) => (
               <ActionCard
                 key={action.actionId}
-                action={action}
-                selected={selectedAction === action.actionId}
+                className={`bg-slate-700/40 border-slate-600 cursor-pointer transition-all ${selectedAction === action.actionId
+                    ? 'border-cyan-400 ring-1 ring-cyan-400/50'
+                    : 'hover:border-slate-500'}`}
                 onClick={() => setSelectedAction(action.actionId)}
               />
             ))}
@@ -398,11 +470,9 @@ export default function Top() {
               {selectedActionOutcomes.outcomes.map((outcome: any) => (
                 <div
                   key={outcome.outcomeId}
-                  className={`p-3 rounded-md cursor-pointer transition-all ${
-                    selectedOutcome === outcome.outcomeId
+                  className={`p-3 rounded-md cursor-pointer transition-all ${selectedOutcome === outcome.outcomeId
                       ? 'bg-cyan-900/50 border border-cyan-400'
-                      : 'bg-slate-600/50 border border-slate-600 hover:border-slate-500'
-                  }`}
+                      : 'bg-slate-600/50 border border-slate-600 hover:border-slate-500'}`}
                   onClick={() => setSelectedOutcome(outcome.outcomeId)}
                 >
                   <div className="flex items-center justify-between">

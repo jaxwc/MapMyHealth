@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, FormEvent, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useHealthStore } from '@/app/state/healthStore';
 // Remove unused import - ChatPanel will work with store directly
-import { SendHorizonal } from 'lucide-react';
+
 import { Button } from './ui/button';
 import { HealthChip } from '@/components/health/HealthChip';
 import { ConditionCard } from '@/components/health/ConditionCard';
@@ -483,7 +484,7 @@ export default function ChatPanel({}: ChatPanelProps) {
           aria-label="Send message"
           className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-pink-600 text-white rounded-lg hover:bg-pink-500 transition-colors disabled:bg-pink-600/50 disabled:cursor-not-allowed"
         >
-          <SendHorizonal className="w-6 h-6" />
+          <Image src="/images/baymax.png" alt="Send" width={40} height={40} />
         </button>
       </form>
     </div>
