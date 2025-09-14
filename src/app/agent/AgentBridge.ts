@@ -121,7 +121,10 @@ export const Agent = {
    */
   addFinding: async (finding: KnownFinding) => {
     const store = useHealthStore.getState();
-    return store.addFinding(finding);
+    console.debug('[AgentBridge] addFinding', finding);
+    const res = await store.addFinding(finding);
+    console.debug('[AgentBridge] addFinding → recompute triggered');
+    return res;
   },
 
   /**
@@ -131,7 +134,10 @@ export const Agent = {
    */
   removeFinding: async (findingId: string) => {
     const store = useHealthStore.getState();
-    return store.removeFinding(findingId);
+    console.debug('[AgentBridge] removeFinding', findingId);
+    const res = await store.removeFinding(findingId);
+    console.debug('[AgentBridge] removeFinding → recompute triggered');
+    return res;
   },
 
   /**
@@ -171,7 +177,10 @@ export const Agent = {
    */
   applyActionOutcome: async (actionId: string, outcomeId: string) => {
     const store = useHealthStore.getState();
-    return store.applyActionOutcome(actionId, outcomeId);
+    console.debug('[AgentBridge] applyActionOutcome', { actionId, outcomeId });
+    const res = await store.applyActionOutcome(actionId, outcomeId);
+    console.debug('[AgentBridge] applyActionOutcome → recompute triggered');
+    return res;
   },
 
   /**

@@ -41,6 +41,11 @@ export default function ChatPanel({}: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamMsgIndexRef = useRef<number | null>(null);
 
+  // Store actions for client-side reconciliation when tools run on the server
+  const addFindingStore = useHealthStore(state => state.addFinding);
+  const removeFindingStore = useHealthStore(state => state.removeFinding);
+  const applyActionOutcomeStore = useHealthStore(state => state.applyActionOutcome);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
@@ -107,6 +112,23 @@ export default function ChatPanel({}: ChatPanelProps) {
         } catch {}
       };
 
+      const reconcileToolResult = async (toolName: string, args: any) => {
+        try {
+          if (toolName === 'addFinding' && args?.id && args?.presence) {
+            console.debug('[ChatPanel] Reconciling addFinding to client store', args);
+            await addFindingStore({ id: args.id, presence: args.presence, value: args.value, daysSinceOnset: args.daysSinceOnset, severity: args.severity, source: 'agent' } as any);
+          } else if (toolName === 'removeFinding' && args?.id) {
+            console.debug('[ChatPanel] Reconciling removeFinding to client store', args);
+            await removeFindingStore(args.id);
+          } else if (toolName === 'applyActionOutcome' && args?.actionId && args?.outcomeId) {
+            console.debug('[ChatPanel] Reconciling applyActionOutcome to client store', args);
+            await applyActionOutcomeStore(args.actionId, args.outcomeId);
+          }
+        } catch (err) {
+          console.warn('[ChatPanel] Failed to reconcile tool result locally', err);
+        }
+      };
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -143,8 +165,10 @@ export default function ChatPanel({}: ChatPanelProps) {
             } else if (evt.type === 'tool') {
               if (evt.data?.toolName === 'addFinding') mirrorLocalFinding(evt.data?.args);
             } else if (evt.type === 'tool-result') {
-              // Optional: could reconcile any final state visualization here.
-              // Keep UI reactive to store; do not maintain a parallel state in chat.
+              // Reconcile store locally so UI reflects changes immediately
+              if (evt.data?.toolName) {
+                reconcileToolResult(evt.data.toolName, evt.data.args);
+              }
             } else if (evt.type === 'error') {
               pushBreadcrumb(`error: ${evt.data}`);
             }
