@@ -1,7 +1,6 @@
 "use client";
 
 import ChatPanel from "@/components/ChatPanel";
-import DiagramPanel from "@/components/bottom";
 import Top from "@/components/top";
 import Header from "@/components/Header";
 
@@ -19,14 +18,8 @@ export default function Home() {
 
 
       <div className="flex flex-1 flex-col gap-4 min-w-0 h-full">
-
-        <div className="h-2/3 min-h-0">
+        <div className="h-full min-h-0 min-w-0 w-full">
           <Top />
-        </div>
-
-
-        <div className="h-1/3 min-h-0">
-          <DiagramPanel />
         </div>
       </div>
     </main>

@@ -26,8 +26,12 @@ import {
   Zap,
   Plus,
   X,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  Wrench,
 } from "lucide-react";
-import { useHealthStore, selectRankedConditions, selectKnownFindings, selectImportantUnknowns, selectTriage, selectTreatmentRecommendation } from "@/app/state/healthStore";
+import { useHealthStore, selectRankedConditions, selectKnownFindings, selectImportantUnknowns, selectTriage, selectTreatmentRecommendation, selectActionRanking } from "@/app/state/healthStore";
 import { getAvailableMockPatients } from "@/app/services/PatientHealthService";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -52,6 +56,17 @@ const InfoChip = ({ text, variant = "default", onRemove }: { text: string; varia
   );
 };
 
+// Simple Mermaid diagram component (skeleton)
+const MermaidDiagram = ({ actionMap }: { actionMap: any }) => (
+  <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] flex items-center justify-center">
+    <p className="text-slate-400 text-sm">
+      🧩 Mermaid diagram placeholder
+      <br />
+      {actionMap?.transitions?.length || 0} action transitions
+    </p>
+  </div>
+);
+
 export default function Top() {
   // Get data from store instead of props
   const rankedConditions = useHealthStore(selectRankedConditions);
@@ -60,11 +75,15 @@ export default function Top() {
   const triage = useHealthStore(selectTriage);
   const treatmentRecommendation = useHealthStore(selectTreatmentRecommendation);
   const engineRecommendation = useHealthStore(state => state.engineRecommendation);
+  const actionRanking = useHealthStore(selectActionRanking);
+  const actionMap = useHealthStore(state => state.actionMap);
 
   // Store actions
   const init = useHealthStore(state => state.init);
   const addFinding = useHealthStore(state => state.addFinding);
   const removeFinding = useHealthStore(state => state.removeFinding);
+  const getActionOutcomes = useHealthStore(state => state.getActionOutcomes);
+  const applyActionOutcome = useHealthStore(state => state.applyActionOutcome);
   const clearTreatmentRecommendation = useHealthStore(state => state.clearTreatmentRecommendation);
   const setTreatmentRecommendation = useHealthStore(state => state.setTreatmentRecommendation);
 
@@ -108,29 +127,40 @@ export default function Top() {
     }, 1000);
   };
 
+  // Actions UI state
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
+  const selectedActionOutcomes = selectedAction ? getActionOutcomes(selectedAction) : null;
+  const handleApplyAction = async () => {
+    if (!selectedAction || !selectedOutcome) return;
+    await applyActionOutcome(selectedAction, selectedOutcome);
+    setSelectedAction(null);
+    setSelectedOutcome(null);
+  };
+
   return (
-    <ScrollArea className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6">
+    <ScrollArea className="h-full w-full min-w-0 rounded-lg border border-pink-500/30 bg-slate-800 p-6">
       <div className="flex flex-col space-y-9">
         <div className="flex items-center justify-between flex-shrink-0">
-        <h3 className="text-xl font-bold text-slate-100">
-          Health Analysis
-        </h3>
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-slate-400" />
-          <Select defaultValue="patient-001" onValueChange={(value) => init(value)}>
-            <SelectTrigger className="w-40 bg-slate-700 border-slate-600 text-slate-200">
-              <SelectValue placeholder="Select patient" />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-800 text-slate-200 border-slate-600">
-              {getAvailableMockPatients().map(patient => (
-                <SelectItem key={patient.id} value={patient.id}>
-                  {patient.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <h3 className="text-xl font-bold text-slate-100">
+            Health Analysis
+          </h3>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-slate-400" />
+            <Select defaultValue="patient-001" onValueChange={(value) => init(value)}>
+              <SelectTrigger className="w-40 bg-slate-700 border-slate-600 text-slate-200">
+                <SelectValue placeholder="Select patient" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 text-slate-200 border-slate-600">
+                {getAvailableMockPatients().map(patient => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    {patient.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
 
       {/* Triage Banner */}
       {triage?.urgent && (
@@ -148,9 +178,9 @@ export default function Top() {
       )}
 
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 min-w-0">
         {/* Known Findings */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-cyan-400 flex items-center gap-2">
               <CheckCircle className="w-5 h-5" /> Known Findings
@@ -209,7 +239,7 @@ export default function Top() {
         </div>
 
         {/* Important Unknowns */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
             <HelpCircle className="w-5 h-5" /> Important Unknowns
           </h4>
@@ -226,14 +256,14 @@ export default function Top() {
       </div>
 
       {/* Ranked Conditions */}
-      <div>
+      <div className="min-w-0">
         <h4 className="font-semibold text-pink-400 mb-2 flex items-center gap-2">
           <AlertTriangle className="w-5 h-5" /> Top Conditions
         </h4>
         {knownFindings.length === 0 || rankedConditions.length === 0 ? (
           <p className="text-sm text-slate-400">Add findings to determine.</p>
         ) : (
-          <ScrollArea className="w-full max-w-full">
+          <ScrollArea className="w-full max-w-full min-w-0">
             <div className="w-max">
               <div className="flex gap-4 pb-4">
                 {rankedConditions.slice(0, 5).map((condition, i) => (
@@ -308,7 +338,114 @@ export default function Top() {
             Click "Update Treatment" to generate AI-powered treatment recommendations.
           </p>
         )}
+      </div>
+
+      {/* Recommended Actions */}
+      <div>
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">⚡ Recommended Actions</h3>
+        {actionRanking.length === 0 ? (
+          <p className="text-sm text-slate-400">Add findings to determine.</p>
+        ) : (
+          <div className="grid gap-3">
+            {actionRanking.slice(0, 5).map((action) => (
+              <Card
+                key={action.actionId}
+                className={`bg-slate-700/40 border-slate-600 cursor-pointer transition-all ${
+                  selectedAction === action.actionId
+                    ? 'border-cyan-400 ring-1 ring-cyan-400/50'
+                    : 'hover:border-slate-500'
+                }`}
+                onClick={() => setSelectedAction(action.actionId)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-slate-200 flex items-center justify-between">
+                    <span>{action.label}</span>
+                    <div className="flex items-center gap-1 text-xs">
+                      <TrendingUp className="w-3 h-3 text-green-400" />
+                      <span className="text-green-400">{action.utility.toFixed(3)}</span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-4 text-slate-300">
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        ${action.costs.money}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {action.costs.timeHours}h
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Wrench className="w-3 h-3" />
+                        {action.costs.difficulty}
+                      </div>
+                      {action.costs.risk > 0 && (
+                        <div className="flex items-center gap-1 text-yellow-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          {action.costs.risk}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-xs text-slate-400">Info Gain: {action.expectedInfoGain.toFixed(3)}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Action Outcome Selection */}
+      {selectedAction && selectedActionOutcomes && (
+        <div>
+          <h3 className="text-lg font-semibold text-slate-100 mb-4">🎯 Select Outcome</h3>
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <p className="text-slate-300 mb-3">
+              Action: <strong>{actionRanking.find(a => a.actionId === selectedAction)?.label}</strong>
+            </p>
+            <div className="grid gap-2 mb-4">
+              {selectedActionOutcomes.outcomes.map((outcome: any) => (
+                <div
+                  key={outcome.outcomeId}
+                  className={`p-3 rounded-md cursor-pointer transition-all ${
+                    selectedOutcome === outcome.outcomeId
+                      ? 'bg-cyan-900/50 border border-cyan-400'
+                      : 'bg-slate-600/50 border border-slate-600 hover:border-slate-500'
+                  }`}
+                  onClick={() => setSelectedOutcome(outcome.outcomeId)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-200">{outcome.description}</span>
+                    <span className="text-xs text-slate-400">{(outcome.probEstimate * 100).toFixed(1)}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleApplyAction} disabled={!selectedOutcome} size="sm">
+                Apply Outcome
+              </Button>
+              <Button
+                onClick={() => { setSelectedAction(null); setSelectedOutcome(null); }}
+                variant="outline"
+                size="sm"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Action Decision Tree */}
+      {actionMap && actionMap.transitions.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-slate-100 mb-4">🌳 Action Decision Tree</h3>
+          <MermaidDiagram actionMap={actionMap} />
+        </div>
+      )}
       </div>
       <ScrollBar orientation="vertical" />
     </ScrollArea>
