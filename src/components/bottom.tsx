@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -21,6 +20,7 @@ import {
 } from "lucide-react";
 import { useHealthStore, selectKnownFindings, selectActionRanking } from "@/app/state/healthStore";
 import type { KnownFinding } from "@/app/types/health";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 
 // Simple Mermaid diagram component (skeleton)
@@ -35,8 +35,6 @@ const MermaidDiagram = ({ actionMap }: { actionMap: any }) => (
 );
 
 export default function Bottom() {
-  const [newFindingId, setNewFindingId] = useState("");
-  const [newFindingPresence, setNewFindingPresence] = useState<"present" | "absent">("present");
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   // Store selectors
@@ -45,23 +43,11 @@ export default function Bottom() {
   const actionMap = useHealthStore(state => state.actionMap);
 
   // Store actions
-  const addFinding = useHealthStore(state => state.addFinding);
-  const removeFinding = useHealthStore(state => state.removeFinding);
+  // Findings editor moved to Top panel
   const getActionOutcomes = useHealthStore(state => state.getActionOutcomes);
   const applyActionOutcome = useHealthStore(state => state.applyActionOutcome);
 
-  const handleAddFinding = () => {
-    if (!newFindingId.trim()) return;
-
-    const finding: KnownFinding = {
-      id: newFindingId.trim(),
-      presence: newFindingPresence,
-      source: "user"
-    };
-
-    addFinding(finding);
-    setNewFindingId("");
-  };
+  //
 
   const handleApplyAction = async () => {
     if (!selectedAction || !selectedOutcome) return;
@@ -74,78 +60,17 @@ export default function Bottom() {
   const selectedActionOutcomes = selectedAction ? getActionOutcomes(selectedAction) : null;
 
   return (
-    <div className="h-full w-full rounded-xl border border-pink-500/30 bg-slate-800 p-6 overflow-y-auto space-y-6">
-      {/* Findings Editor */}
-      <div>
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">
-          📋 Findings Editor
-        </h3>
-        {/* Add New Finding */}
-        <div className="bg-slate-700/50 rounded-lg p-4 mb-4">
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-slate-300 block mb-1">
-                Finding ID
-              </label>
-              <Input
-                placeholder="e.g., fever, sore_throat"
-                value={newFindingId}
-                onChange={(e) => setNewFindingId(e.target.value)}
-                className="bg-slate-600 border-slate-500 text-slate-100"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300 block mb-1">
-                Presence
-              </label>
-              <Select value={newFindingPresence} onValueChange={(value: "present" | "absent") => setNewFindingPresence(value)}>
-                <SelectTrigger className="w-32 bg-slate-600 border-slate-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="present">Present</SelectItem>
-                  <SelectItem value="absent">Absent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={handleAddFinding} size="sm">
-              <Plus className="w-4 h-4" />
-              Add
-            </Button>
-          </div>
-        </div>
-
-        {/* Current Findings */}
-        {knownFindings.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-slate-300">Current Findings:</h4>
-            {knownFindings.map((finding, index) => (
-              <div key={index} className="flex items-center justify-between bg-slate-600/50 p-3 rounded-md">
-                <span className="text-slate-200">
-                  <strong>{finding.id}</strong>: {finding.presence}
-                  {finding.source && (
-                    <span className="text-xs text-slate-400 ml-2">({finding.source})</span>
-                  )}
-                </span>
-                <Button
-                  onClick={() => removeFinding(finding.id)}
-                  size="sm"
-                  variant="destructive"
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+    <ScrollArea className="h-full w-full rounded-xl border border-pink-500/30 bg-slate-800 p-6 space-y-6">
+      {/* Findings Editor moved to Top panel */}
 
       {/* Action Ranking */}
-      {actionRanking.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-slate-100 mb-4">
-            ⚡ Recommended Actions
-          </h3>
+      <div>
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">
+          ⚡ Recommended Actions
+        </h3>
+        {actionRanking.length === 0 ? (
+          <p className="text-sm text-slate-400">Add findings to determine.</p>
+        ) : (
           <div className="grid gap-3">
             {actionRanking.slice(0, 5).map((action) => (
               <Card
@@ -196,8 +121,8 @@ export default function Bottom() {
               </Card>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Action Outcome Selection */}
       {selectedAction && selectedActionOutcomes && (
@@ -262,6 +187,7 @@ export default function Bottom() {
           <MermaidDiagram actionMap={actionMap} />
         </div>
       )}
-    </div>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 }

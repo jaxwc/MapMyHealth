@@ -4,6 +4,7 @@ import { useState, FormEvent, useRef, useEffect } from 'react';
 // Remove unused import - ChatPanel will work with store directly
 import { SendHorizonal } from 'lucide-react';
 import { Button } from './ui/button';
+import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -122,7 +123,7 @@ export default function ChatPanel({}: ChatPanelProps) {
       </h2>
 
 
-      <div className="flex-grow overflow-y-auto mb-4 pr-2">
+      <ScrollArea className="flex-grow mb-4 pr-2">
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -149,7 +150,8 @@ export default function ChatPanel({}: ChatPanelProps) {
           </div>
         )}
         <div ref={messagesEndRef} />
-      </div>
+        <ScrollBar orientation="vertical" />
+      </ScrollArea>
 
       <form
         onSubmit={handleSubmit}

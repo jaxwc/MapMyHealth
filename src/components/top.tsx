@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,6 +9,12 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   CheckCircle,
   HelpCircle,
   AlertTriangle,
@@ -16,18 +22,30 @@ import {
   Users,
   RefreshCw,
   Zap,
+  Plus,
+  X,
 } from "lucide-react";
 import { useHealthStore, selectRankedConditions, selectKnownFindings, selectImportantUnknowns, selectTriage, selectTreatmentRecommendation } from "@/app/state/healthStore";
 import { getAvailableMockPatients } from "@/app/services/PatientHealthService";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-const InfoChip = ({ text, variant = "default" }: { text: string; variant?: "default" | "present" | "absent" }) => {
+const InfoChip = ({ text, variant = "default", onRemove }: { text: string; variant?: "default" | "present" | "absent"; onRemove?: () => void }) => {
   const bgColor = variant === "present" ? "bg-green-700/50" :
                   variant === "absent" ? "bg-red-700/50" :
                   "bg-slate-700/50";
 
   return (
-    <div className={`${bgColor} p-2 rounded-md text-slate-300 text-sm`}>
-      {text}
+    <div className={`${bgColor} px-2 py-1 rounded-md text-slate-200 text-sm inline-flex items-center gap-2` }>
+      <span className="truncate max-w-[220px]">{text}</span>
+      {onRemove && (
+        <button
+          aria-label="Remove"
+          className="rounded-full p-0.5 hover:bg-slate-600/60 text-slate-100"
+          onClick={onRemove}
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
     </div>
   );
 };
@@ -43,10 +61,29 @@ export default function Top() {
 
   // Store actions
   const init = useHealthStore(state => state.init);
+  const addFinding = useHealthStore(state => state.addFinding);
+  const removeFinding = useHealthStore(state => state.removeFinding);
   const clearTreatmentRecommendation = useHealthStore(state => state.clearTreatmentRecommendation);
   const setTreatmentRecommendation = useHealthStore(state => state.setTreatmentRecommendation);
 
   const hasData = rankedConditions.length > 0 || knownFindings.length > 0 || importantUnknowns.length > 0;
+
+  // Content pack: all findings for "+" dropdown
+  const [allFindings, setAllFindings] = useState<Array<{ id: string; label?: string }>>([]);
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/content-pack');
+        const json = await res.json();
+        if (json?.findings) {
+          setAllFindings(json.findings);
+        }
+      } catch {
+        // no-op if fails; UI will still work without dropdown
+      }
+    };
+    load();
+  }, []);
 
   // Mock treatment generation for the button
   const handleUpdateTreatment = async () => {
@@ -68,18 +105,8 @@ export default function Top() {
     }, 1000);
   };
 
-  if (!hasData) {
-    return (
-      <div className="flex h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-8 items-start justify-start">
-        <h2 className="text-xl font-bold text-slate-100 flex-shrink-0">
-          Analysis Summary
-        </h2>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6 flex flex-col space-y-3 overflow-y-auto">
+    <ScrollArea className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6 flex flex-col space-y-9">
       <div className="flex items-center justify-between flex-shrink-0">
         <h3 className="text-xl font-bold text-slate-100">
           Analysis Summary
@@ -117,80 +144,111 @@ export default function Top() {
       )}
 
       {/* Engine Recommendation */}
-      {engineRecommendation && (
+      {/* {engineRecommendation && (
         <div className="bg-blue-900/50 border border-blue-500/50 rounded-lg p-3 flex-shrink-0">
           <p className="text-blue-200 text-sm font-medium">
             📋 {engineRecommendation}
           </p>
         </div>
-      )}
+      )} */}
 
       <div className="flex flex-col md:flex-row gap-4">
         {/* Known Findings */}
-        {knownFindings.length > 0 && (
-          <div className="flex-1">
-            <h4 className="font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold text-cyan-400 flex items-center gap-2">
               <CheckCircle className="w-5 h-5" /> Known Findings
             </h4>
-            <div className="flex flex-col space-y-2">
-              {knownFindings.slice(0, 5).map((finding, i) => (
-                <InfoChip
-                  key={i}
-                  text={`${finding.id}: ${finding.presence}`}
-                  variant={finding.presence === "present" ? "present" : "absent"}
-                />
-              ))}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-slate-200">
+                  <Plus className="w-4 h-4 mr-1" /> Add
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-h-72 w-64 overflow-auto bg-slate-800 text-slate-200 border-slate-600">
+                {allFindings
+                  .filter(f => !new Set(knownFindings.filter(k => k.presence === 'present').map(k => k.id)).has(f.id))
+                  .map((f) => (
+                    <DropdownMenuItem
+                      key={f.id}
+                      onClick={() => addFinding({ id: f.id, presence: 'present', source: 'user' })}
+                      className="cursor-pointer"
+                    >
+                      {f.label || f.id}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        )}
+          <div className="flex flex-wrap gap-2">
+            {knownFindings.filter(f => f.presence === 'present').slice(0, 20).map((finding, i) => (
+              <InfoChip
+                key={`${finding.id}-${i}`}
+                text={finding.id}
+                variant="present"
+                onRemove={() => removeFinding(finding.id)}
+              />
+            ))}
+            {knownFindings.filter(f => f.presence === 'present').length === 0 && (
+              <p className="text-sm text-slate-400">No findings yet. Use Add to select findings.</p>
+            )}
+          </div>
+        </div>
 
         {/* Important Unknowns */}
-        {importantUnknowns.length > 0 && (
-          <div className="flex-1">
-            <h4 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
-              <HelpCircle className="w-5 h-5" /> Important Unknowns
-            </h4>
+        <div className="flex-1">
+          <h4 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
+            <HelpCircle className="w-5 h-5" /> Important Unknowns
+          </h4>
+          {knownFindings.length === 0 || importantUnknowns.length === 0 ? (
+            <p className="text-sm text-slate-400">Add findings to determine.</p>
+          ) : (
             <div className="flex flex-col space-y-2">
               {importantUnknowns.slice(0, 5).map((unknown, i) => (
                 <InfoChip key={i} text={unknown.prompt} />
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Ranked Conditions */}
-      {rankedConditions.length > 0 && (
-        <div>
-          <h4 className="font-semibold text-pink-400 mb-2 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" /> Top Conditions
-          </h4>
-          <div className="flex overflow-x-auto gap-4 pb-4">
-            {rankedConditions.slice(0, 5).map((condition, i) => (
-              <Card
-                key={i}
-                className="w-[280px] flex-shrink-0 rounded-lg bg-slate-700/40 border-pink-500/30 text-slate-200"
-              >
-                <CardHeader>
-                  <CardTitle className="text-pink-400">
-                    {condition.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-slate-300 mb-2">
-                    <strong>{(condition.score * 100).toFixed(1)}%</strong> probability
-                  </p>
-                  {condition.rationale && (
-                    <p className="text-xs text-slate-400">
-                      {condition.rationale}
+      <div>
+        <h4 className="font-semibold text-pink-400 mb-2 flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5" /> Top Conditions
+        </h4>
+        {knownFindings.length === 0 || rankedConditions.length === 0 ? (
+          <p className="text-sm text-slate-400">Add findings to determine.</p>
+        ) : (
+          <ScrollArea className="w-full">
+            <div className="flex gap-4 pb-4">
+              {rankedConditions.slice(0, 5).map((condition, i) => (
+                <Card
+                  key={i}
+                  className="w-[280px] flex-shrink-0 rounded-lg bg-slate-700/40 border-pink-500/30 text-slate-200"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-pink-400">
+                      {condition.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-slate-300 mb-2">
+                      <strong>{(condition.score * 100).toFixed(1)}%</strong> probability
                     </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
+                    {condition.rationale && (
+                      <p className="text-xs text-slate-400">
+                        {condition.rationale}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        )}
+      </div>
 
       {/* Treatment Recommendations */}
       <div className="flex-shrink-0">
@@ -209,7 +267,9 @@ export default function Top() {
           </Button>
         </div>
 
-        {treatmentRecommendation ? (
+        {knownFindings.length === 0 ? (
+          <p className="text-slate-400 text-sm">Add findings to determine.</p>
+        ) : treatmentRecommendation ? (
           <div className="space-y-2">
             <p className="text-xs text-slate-400 mb-3">
               Generated: {new Date(treatmentRecommendation.generatedAt).toLocaleString()}
@@ -234,6 +294,7 @@ export default function Top() {
           </p>
         )}
       </div>
-    </div>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 }

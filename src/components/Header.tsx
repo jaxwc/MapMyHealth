@@ -19,14 +19,6 @@ export default function Header() {
       <ContextMenu>
         <ContextMenuTrigger>
           <div className="inline-flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-slate-200 hover:text-slate-100 hover:bg-slate-700"
-              aria-label="Profile"
-            >
-              <User className="w-6 h-6" />
-            </Button>
             <Avatar className="rounded-full border border-slate-600">
               <AvatarImage src="" alt="Profile" />
               <AvatarFallback>U</AvatarFallback>
