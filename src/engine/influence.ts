@@ -38,8 +38,11 @@ export function mostInformativeUnknowns(
   caseState?: CaseState
 ): UnknownInfo[] {
   const unknownFindings = findingDefs.filter(finding =>
-    !beliefs || Object.keys(beliefs).length === 0 ||
-    !hasKnownValue(finding.id, beliefs, conditionDefs, caseState)
+    // Finding must be unknown (not already have a known value)
+    (!beliefs || Object.keys(beliefs).length === 0 ||
+    !hasKnownValue(finding.id, beliefs, conditionDefs, caseState)) &&
+    // Finding must not contradict any known findings
+    !contradictsKnownFindings(finding, findingDefs, caseState)
   );
   
   const scoredUnknowns: UnknownInfo[] = [];
@@ -133,6 +136,33 @@ function hasKnownValue(findingId: string, beliefs: Beliefs, conditionDefs: Condi
   }
 
   return false; // If no case state provided, assume unknown
+}
+
+/**
+ * Check if a finding contradicts any known findings
+ * @param finding - Finding definition to check
+ * @param findingDefs - All finding definitions (for contradiction lookup)
+ * @param caseState - Current case state with known findings
+ * @returns true if this finding contradicts any known findings
+ */
+function contradictsKnownFindings(
+  finding: FindingDef,
+  findingDefs: FindingDef[],
+  caseState?: CaseState
+): boolean {
+  if (!caseState?.findings || !finding.contradictsWith) {
+    return false;
+  }
+
+  // Get all known findings that are present
+  const knownPresentFindings = caseState.findings
+    .filter(f => f.presence === "present")
+    .map(f => f.findingId);
+
+  // Check if any of the contradictory findings are known to be present
+  return finding.contradictsWith.some(contradictoryId =>
+    knownPresentFindings.includes(contradictoryId)
+  );
 }
 
 /**

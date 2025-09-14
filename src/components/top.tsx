@@ -262,6 +262,7 @@ export default function Top() {
           <h3 className="text-xl font-bold text-slate-100">
             Health Analysis
           </h3>
+          {/* Patient Select */}
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-slate-400" />
             <Select defaultValue="patient-001" onValueChange={(value) => init(value)}>

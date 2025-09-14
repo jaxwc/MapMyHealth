@@ -60,42 +60,48 @@
     "label": "Rapid strep test positive",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["rapid_strep_negative"]
   },
   {
     "id": "rapid_strep_negative",
     "label": "Rapid strep test negative",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["rapid_strep_positive"]
   },
   {
     "id": "throat_culture_positive",
     "label": "Throat culture positive",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["throat_culture_negative"]
   },
   {
     "id": "throat_culture_negative",
     "label": "Throat culture negative",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["throat_culture_positive"]
   },
   {
     "id": "monospot_positive",
     "label": "Monospot test positive",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["monospot_negative"]
   },
   {
     "id": "monospot_negative",
     "label": "Monospot test negative",
     "kind": "testFinding",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "contradictsWith": ["monospot_positive"]
   },
   {
     "id": "drooling",
