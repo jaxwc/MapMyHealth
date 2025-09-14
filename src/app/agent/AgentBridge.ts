@@ -184,6 +184,50 @@ export const Agent = {
   },
 
   /**
+   * Executes an action by applying a chosen outcome and updates the board state.
+   * Mirrors the UI flow in `top.tsx`: calls the server mutate endpoint then replaces the client snapshot.
+   * If running server-side (or the network call fails), falls back to the local store mutation.
+   * @param actionId - ID of the action to perform
+   * @param outcomeId - ID of the outcome to apply
+   * @returns The latest health state snapshot after the mutation
+   */
+  takeAction: async (actionId: string, outcomeId: string): Promise<HealthState> => {
+    // Prefer server-authoritative mutation (same as UI) when in browser
+    const isBrowser = typeof window !== 'undefined';
+    const store = useHealthStore.getState();
+
+    if (isBrowser) {
+      try {
+        console.debug('[AgentBridge] takeAction → POST /api/state/mutate', { actionId, outcomeId });
+        const response = await fetch('/api/state/mutate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ op: 'applyActionOutcome', payload: { actionId, outcomeId } })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Mutate endpoint failed: ${response.status}`);
+        }
+
+        const snapshot = await response.json();
+        // Hydrate client store with server snapshot to keep parity
+        (store as any).replaceAll?.(snapshot);
+        console.debug('[AgentBridge] takeAction → store.replaceAll applied');
+        return useHealthStore.getState();
+      } catch (error) {
+        console.warn('[AgentBridge] takeAction server path failed, falling back to local store', error);
+        await store.applyActionOutcome(actionId, outcomeId);
+        return useHealthStore.getState();
+      }
+    }
+
+    // Server-side or non-browser: apply directly to the store
+    console.debug('[AgentBridge] takeAction (server/local) applyActionOutcome', { actionId, outcomeId });
+    await store.applyActionOutcome(actionId, outcomeId);
+    return useHealthStore.getState();
+  },
+
+  /**
    * Simulates the effect of choosing an outcome without committing it to state.
    * Use this for "what-if" exploration and planning before making changes.
    * @param actionId - action to simulate
@@ -362,7 +406,7 @@ export function validateAgentAction(action: string, parameters: any): { valid: b
   // Basic validation logic
   const validActions = [
     'readHealthState', 'readConditionInformation', 'addFinding', 'removeFinding',
-    'getActionOutcomes', 'applyActionOutcome', 'addRecommendedTreatment',
+    'getActionOutcomes', 'applyActionOutcome', 'takeAction', 'addRecommendedTreatment',
     'generateTreatmentRecommendation', 'assessUrgency'
   ];
 
@@ -380,6 +424,12 @@ export function validateAgentAction(action: string, parameters: any): { valid: b
     case 'readConditionInformation':
       if (!parameters.conditionId) {
         return { valid: false, error: 'conditionId is required' };
+      }
+      break;
+    case 'applyActionOutcome':
+    case 'takeAction':
+      if (!parameters.actionId || !parameters.outcomeId) {
+        return { valid: false, error: 'actionId and outcomeId are required' };
       }
       break;
   }

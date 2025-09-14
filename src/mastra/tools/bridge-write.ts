@@ -48,6 +48,17 @@ export const applyActionOutcomeTool = createTool({
   },
 });
 
+export const takeActionTool = createTool({
+  id: 'takeAction',
+  description: 'Takes an action by applying an outcome and syncing state via the server mutate endpoint (mirrors UI).',
+  inputSchema: z.object({ actionId: z.string(), outcomeId: z.string() }),
+  outputSchema: z.object({ success: z.boolean() }),
+  execute: async ({ context }) => {
+    await AgentBridge.takeAction(context.actionId, context.outcomeId);
+    return { success: true };
+  },
+});
+
 export const updatePatientDataTool = createTool({
   id: 'updatePatientData',
   description: 'Updates patient demographics/history in the store.',
@@ -63,6 +74,7 @@ export const bridgeWriteTools = {
   addFinding: addFindingTool,
   removeFinding: removeFindingTool,
   applyActionOutcome: applyActionOutcomeTool,
+  takeAction: takeActionTool,
   updatePatientData: updatePatientDataTool,
 };
 

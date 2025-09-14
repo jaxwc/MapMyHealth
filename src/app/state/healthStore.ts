@@ -105,7 +105,9 @@ export const useHealthStore = create<HealthStore>()(
       engineRecommendation: undefined,
       escalationResult: undefined,
       costWeights: DEFAULT_COST_WEIGHTS,
-      completedActions: []
+      completedActions: [],
+      // versioning for synchronization
+      stateVersion: 0 as unknown as number
     };
 
     // Store actions
@@ -126,12 +128,13 @@ export const useHealthStore = create<HealthStore>()(
           escalationResult: (next as any).escalationResult,
           costWeights: next.costWeights || DEFAULT_COST_WEIGHTS,
           completedActions: next.completedActions || [],
+          stateVersion: (next as any).stateVersion ?? get().stateVersion,
         });
       },
 
       resetAll: async () => {
         // Reset to initial state on server and recompute for a clean baseline
-        set({ ...initialState });
+        set({ ...initialState, stateVersion: (get().stateVersion ?? 0) + 1 });
         await recompute();
       },
       init: async (patientId?: string) => {
@@ -148,7 +151,8 @@ export const useHealthStore = create<HealthStore>()(
 
       addFinding: async (finding: KnownFinding) => {
         set((state) => ({
-          knownFindings: [...(state.knownFindings || []), finding]
+          knownFindings: [...(state.knownFindings || []), finding],
+          stateVersion: (state.stateVersion ?? 0) + 1
         }));
         clearTreatmentsOnChange();
         await recompute();
@@ -156,14 +160,15 @@ export const useHealthStore = create<HealthStore>()(
 
       removeFinding: async (id: string) => {
         set((state) => ({
-          knownFindings: (state.knownFindings || []).filter(f => f.id !== id)
+          knownFindings: (state.knownFindings || []).filter(f => f.id !== id),
+          stateVersion: (state.stateVersion ?? 0) + 1
         }));
         clearTreatmentsOnChange();
         await recompute();
       },
 
       setPatientData: async (patientData: PatientData) => {
-        set({ patientData });
+        set((state) => ({ patientData, stateVersion: (state.stateVersion ?? 0) + 1 }));
         clearTreatmentsOnChange();
         await recompute();
       },
@@ -282,7 +287,8 @@ export const useHealthStore = create<HealthStore>()(
             completedActions: [...(state.completedActions || []), newCompletedAction],
             treatmentRecommendation: undefined, // Clear on state change
             escalationResult, // Store escalation result
-            triage: escalationResult?.newTriage || state.triage // Update triage if escalated
+            triage: escalationResult?.newTriage || state.triage, // Update triage if escalated
+            stateVersion: (state.stateVersion ?? 0) + 1
           };
         });
 

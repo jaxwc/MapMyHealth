@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,164 +25,16 @@ import {
   RefreshCw,
   Zap,
   Plus,
-  X,
-  TrendingUp,
-  DollarSign,
-  Clock,
-  Wrench,
 } from "lucide-react";
 import { useHealthStore, selectRankedConditions, selectKnownFindings, selectImportantUnknowns, selectTriage, selectTreatmentRecommendation, selectActionRanking } from "@/app/state/healthStore";
 import { getAvailableMockPatients } from "@/app/services/PatientHealthService";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { HealthChip } from '@/components/health/HealthChip';
+import { ConditionCard } from '@/components/health/ConditionCard';
+import { ActionCard } from '@/components/health/ActionCard';
+import { MermaidDiagram } from '@/components/health/MermaidDiagram';
 
-const InfoChip = ({ text, variant = "default", onRemove }: { text: string; variant?: "default" | "present" | "absent"; onRemove?: () => void }) => {
-  const bgColor = variant === "present" ? "bg-green-700/50" :
-                  variant === "absent" ? "bg-red-700/50" :
-                  "bg-slate-700/50";
-
-  return (
-    <div className={`${bgColor} px-2 py-1 rounded-md text-slate-200 text-sm inline-flex items-center gap-2` }>
-      <span className="truncate max-w-[220px]">{text}</span>
-      {onRemove && (
-        <button
-          aria-label="Remove"
-          className="rounded-full p-0.5 hover:bg-slate-600/60 text-slate-100"
-          onClick={onRemove}
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-      )}
-    </div>
-  );
-};
-
-// Helper function to format status labels
-const formatStatusLabel = (statusLabel: string) => {
-  const labels: Record<string, string> = {
-    'highly-likely': 'Highly Likely',
-    'likely': 'Likely',
-    'unknown': 'Possible',
-    'possible': 'Possible',
-    'not-likely': 'Not Likely',
-    'very-unlikely': 'Very Unlikely'
-  };
-  return labels[statusLabel] || statusLabel;
-};
-
-// Helper function to get status color
-const getStatusColor = (statusLabel: string) => {
-  const colors: Record<string, string> = {
-    'highly-likely': 'text-red-400',
-    'likely': 'text-orange-400',
-    'unknown': 'text-yellow-400',
-    'possible': 'text-yellow-400',
-    'not-likely': 'text-blue-400',
-    'very-unlikely': 'text-green-400'
-  };
-  return colors[statusLabel] || 'text-slate-400';
-};
-
-// Mermaid diagram component
-const MermaidDiagram = ({ actionMap }: { actionMap: any }) => {
-  const mermaidRef = useRef<HTMLDivElement>(null);
-  const [diagramId] = useState(`mermaid-${Math.random().toString(36).slice(2, 11)}`);
-
-  useEffect(() => {
-    const renderDiagram = async () => {
-      if (!mermaidRef.current || !actionMap?.transitions?.length) return;
-
-      try {
-        // Dynamic import to avoid SSR issues
-        const mermaid = (await import('mermaid')).default;
-
-        // Initialize mermaid with dark theme
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'dark',
-          themeVariables: {
-            primaryColor: '#3b82f6',
-            primaryTextColor: '#e2e8f0',
-            primaryBorderColor: '#475569',
-            lineColor: '#64748b',
-            secondaryColor: '#1e293b',
-            tertiaryColor: '#0f172a',
-            background: '#0f172a',
-            mainBkg: '#1e293b',
-            secondBkg: '#334155',
-            tertiaryBkg: '#475569'
-          }
-        });
-
-        // Generate mermaid syntax from actionMap
-        let mermaidSyntax = 'flowchart TD\n';
-
-        // Add root node
-        mermaidSyntax += `  Start["${actionMap.root.label}"]\n`;
-
-        // Add transitions
-        actionMap.transitions.forEach((transition: any, index: number) => {
-          const actionId = `A${index}`;
-          mermaidSyntax += `  ${actionId}["${transition.actionLabel}"]\n`;
-          mermaidSyntax += `  Start --> ${actionId}\n`;
-
-          // Add outcomes
-          transition.outcomes.forEach((outcome: any, outcomeIndex: number) => {
-            const outcomeId = `O${index}_${outcomeIndex}`;
-            mermaidSyntax += `  ${outcomeId}["${outcome.label}"]\n`;
-            mermaidSyntax += `  ${actionId} --> ${outcomeId}\n`;
-
-            // Link to outcome destination if available
-            if (outcome.to?.label) {
-              const destId = `D${index}_${outcomeIndex}`;
-              mermaidSyntax += `  ${destId}["${outcome.to.label}"]\n`;
-              mermaidSyntax += `  ${outcomeId} --> ${destId}\n`;
-            }
-          });
-        });
-
-        // Add styling
-        mermaidSyntax += `
-  classDef default fill:#1e293b,stroke:#475569,stroke-width:2px,color:#e2e8f0
-  classDef action fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#ffffff
-  classDef outcome fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
-  classDef destination fill:#dc2626,stroke:#b91c1c,stroke-width:2px,color:#ffffff
-`;
-
-        // Clear previous content and render
-        mermaidRef.current.innerHTML = '';
-        const { svg } = await mermaid.render(diagramId, mermaidSyntax);
-        mermaidRef.current.innerHTML = svg;
-
-        // Apply additional styling to the rendered SVG
-        const svgElement = mermaidRef.current.querySelector('svg');
-        if (svgElement) {
-          svgElement.style.width = '100%';
-          svgElement.style.height = 'auto';
-          svgElement.style.minHeight = '200px';
-        }
-
-      } catch (error) {
-        console.error('Error rendering mermaid diagram:', error);
-        if (mermaidRef.current) {
-          mermaidRef.current.innerHTML = `
-            <div class="text-center text-slate-400 py-8">
-              <p>Error rendering diagram</p>
-              <p class="text-xs mt-2">${actionMap?.transitions?.length || 0} action transitions available</p>
-            </div>
-          `;
-        }
-      }
-    };
-
-    renderDiagram();
-  }, [actionMap, diagramId]);
-
-  return (
-    <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] overflow-auto">
-      <div ref={mermaidRef} className="mermaid-diagram" />
-    </div>
-  );
-};
+// Use shared components instead of local inline UIs
 
 export default function Top() {
   // Get data from store instead of props
@@ -358,7 +210,7 @@ export default function Top() {
           </div>
           <div className="flex flex-wrap gap-2">
             {knownFindings.filter(f => f.presence === 'present').slice(0, 20).map((finding, i) => (
-              <InfoChip
+              <HealthChip
                 key={`${finding.id}-${i}`}
                 text={finding.id}
                 variant="present"
@@ -442,7 +294,7 @@ export default function Top() {
           ) : (
             <div className="flex flex-col space-y-2">
               {importantUnknowns.slice(0, 5).map((unknown, i) => (
-                <InfoChip key={i} text={unknown.prompt} />
+                <HealthChip key={i} text={unknown.prompt} />
               ))}
             </div>
           )}
@@ -461,26 +313,7 @@ export default function Top() {
             <div className="w-max">
               <div className="flex gap-4 pb-4">
                 {rankedConditions.slice(0, 5).map((condition, i) => (
-                  <Card
-                    key={i}
-                    className="w-[280px] flex-shrink-0 rounded-lg bg-slate-700/40 border-pink-500/30 text-slate-200"
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-pink-400">
-                        {condition.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-3">
-                        <div className={`text-lg font-bold ${getStatusColor(condition.statusLabel)} mb-1`}>
-                          {formatStatusLabel(condition.statusLabel)}
-                        </div>
-                        <div className="text-xs text-slate-500 font-mono">
-                          {(condition.score * 100).toFixed(1)}% probability
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ConditionCard key={i} condition={condition} />
                 ))}
               </div>
             </div>
@@ -542,50 +375,12 @@ export default function Top() {
         ) : (
           <div className="grid gap-3">
             {actionRanking.slice(0, 5).map((action) => (
-              <Card
+              <ActionCard
                 key={action.actionId}
-                className={`bg-slate-700/40 border-slate-600 cursor-pointer transition-all ${
-                  selectedAction === action.actionId
-                    ? 'border-cyan-400 ring-1 ring-cyan-400/50'
-                    : 'hover:border-slate-500'
-                }`}
+                action={action}
+                selected={selectedAction === action.actionId}
                 onClick={() => setSelectedAction(action.actionId)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-slate-200 flex items-center justify-between">
-                    <span>{action.label}</span>
-                    <div className="flex items-center gap-1 text-xs">
-                      <TrendingUp className="w-3 h-3 text-green-400" />
-                      <span className="text-green-400">{action.utility.toFixed(3)}</span>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-4 text-slate-300">
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        ${action.costs.money}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {action.costs.timeHours}h
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Wrench className="w-3 h-3" />
-                        {action.costs.difficulty}
-                      </div>
-                      {action.costs.risk > 0 && (
-                        <div className="flex items-center gap-1 text-yellow-400">
-                          <AlertTriangle className="w-3 h-3" />
-                          {action.costs.risk}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-xs text-slate-400">Info Gain: {action.expectedInfoGain.toFixed(3)}</div>
-                </CardContent>
-              </Card>
+              />
             ))}
           </div>
         )}
@@ -635,7 +430,7 @@ export default function Top() {
 
       {/* Action Decision Tree */}
       <div>
-        <h3 className="text-lg font-semibold text-slate-100 mb-4"> Recommended Next Steps </h3>
+        <h3 className="text-lg font-semibold text-slate-100 mb-4"> Visualized Outcomes: </h3>
         {!hasPresentFindings ? (
           <div className="bg-slate-900 border border-slate-600 rounded-lg p-4 min-h-[200px] flex items-center justify-center">
             <p className="text-slate-400 text-sm text-center">

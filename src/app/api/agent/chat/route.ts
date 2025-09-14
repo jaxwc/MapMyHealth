@@ -42,6 +42,17 @@ export async function POST(req: Request) {
               if (result && typeof result === 'object' && result.ui) {
                 controller.enqueue(encoder.encode(JSON.stringify({ type: 'ui', data: result }) + '\n'));
               }
+              // Emit a finding chip UI event when a finding is added for instant visual feedback
+              if (toolName === 'addFinding' && args?.id) {
+                controller.enqueue(
+                  encoder.encode(
+                    JSON.stringify({ type: 'ui', data: { ui: 'finding-chip', id: args.id, presence: args.presence || 'present' } }) + '\n'
+                  )
+                );
+              }
+              // Also forward stateVersion if tool updated server state (client can re-hydrate on mismatch)
+              const { stateVersion } = (await import('@/app/state/healthStore')).useHealthStore.getState() as any;
+              controller.enqueue(encoder.encode(JSON.stringify({ type: 'stateVersion', data: stateVersion }) + '\n'));
             }
           }
 

@@ -5,7 +5,14 @@ import { useHealthStore } from '@/app/state/healthStore';
 // Remove unused import - ChatPanel will work with store directly
 import { SendHorizonal } from 'lucide-react';
 import { Button } from './ui/button';
+import { HealthChip } from '@/components/health/HealthChip';
+import { ConditionCard } from '@/components/health/ConditionCard';
+import { ActionCard } from '@/components/health/ActionCard';
+import { MermaidDiagram } from '@/components/health/MermaidDiagram';
+import { useHealthStore as useStore } from '@/app/state/healthStore';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +24,7 @@ import {
 interface Message {
   sender: "user" | "ai";
   text: string;
+  jsx?: React.ReactNode;
 }
 
 interface ChatPanelProps {
@@ -46,6 +54,7 @@ export default function ChatPanel({}: ChatPanelProps) {
   const removeFindingStore = useHealthStore(state => state.removeFinding);
   const applyActionOutcomeStore = useHealthStore(state => state.applyActionOutcome);
   const replaceAll = useHealthStore(state => (state as any).replaceAll);
+  const stateVersion = useHealthStore((state: any) => state.stateVersion);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -92,25 +101,109 @@ export default function ChatPanel({}: ChatPanelProps) {
         });
       };
 
-      // Show breadcrumbs as small system messages
-      const pushBreadcrumb = (label: string) => {
+      // Show breadcrumbs only for tool-call, not for tool-result
+      const pushBreadcrumb = (phase: string, toolName?: string) => {
+        if (phase !== 'tool-call') return;
+        const label = `${phase}${toolName ? `: ${toolName}` : ''}`;
         setMessages((prev) => [...prev, { sender: 'ai', text: `[${label}]` }]);
       };
 
       const pushUI = (ui: any) => {
-        // Simple placeholder: serialize UI blocks into the chat stream.
-        // Future: render dedicated components for condition/action cards & mermaid.
-        const tag = ui?.ui === 'mermaid' ? 'Mermaid' : 'UI';
-        const content = ui?.definition ?? JSON.stringify(ui);
-        setMessages((prev) => [...prev, { sender: 'ai', text: `${tag}:\n${content}` }]);
+        // Render using shared components by pushing a special Message with a JSX payload
+        const render = () => {
+          if (ui?.ui === 'finding-chip') {
+            return <HealthChip text={ui.id} variant={ui.presence === 'absent' ? 'absent' : 'present'} />;
+          }
+          if (ui?.ui === 'condition-card') {
+            const cond = useStore.getState().rankedConditions.find((c: any) => c.id === ui.conditionId);
+            if (cond) return <ConditionCard condition={cond} />;
+            return <div className="text-slate-300 text-sm">Condition: {ui.conditionId}</div>;
+          }
+          if (ui?.ui === 'action-card') {
+            const act = useStore.getState().actionRanking.find((a: any) => a.actionId === ui.actionId);
+            if (act) return <ActionCard action={act} />;
+            return <div className="text-slate-300 text-sm">Action: {ui.actionId}</div>;
+          }
+          if (ui?.ui === 'mermaid') {
+            return <MermaidDiagram definition={ui.definition} />;
+          }
+          return <div className="text-slate-300 text-xs">{JSON.stringify(ui)}</div>;
+        };
+
+        setMessages((prev) => [...prev, { sender: 'ai', text: '', jsx: render() } as any]);
       };
 
-      const mirrorLocalFinding = (args: any) => {
-        try {
-          if (!args?.id || !args?.presence) return;
-          // Optimistic echo in chat; real state comes from store recompute after tool finishes.
-          setMessages((prev) => [...prev, { sender: 'ai', text: `(noted) finding ${args.id}: ${args.presence}` }]);
-        } catch {}
+      const renderMarkdown = (text: string) => (
+        <div className="text-slate-200 text-sm leading-relaxed">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+        </div>
+      );
+
+      const extractSegments = (text: string): Array<{ type: 'markdown' | 'ui'; value: any }> => {
+        const segments: Array<{ type: 'markdown' | 'ui'; value: any }> = [];
+        if (!text) return segments;
+
+        // First, extract mermaid code blocks ```mermaid ... ```
+        const mermaidRegex = /```mermaid[\r\n]+([\s\S]*?)```/g;
+        let remaining = text;
+        let m: RegExpExecArray | null;
+        while ((m = mermaidRegex.exec(text)) !== null) {
+          const before = remaining.slice(0, remaining.indexOf(m[0]));
+          if (before) segments.push({ type: 'markdown', value: before });
+          segments.push({ type: 'ui', value: { ui: 'mermaid', definition: m[1] } });
+          remaining = remaining.slice(remaining.indexOf(m[0]) + m[0].length);
+        }
+        text = remaining;
+
+        // Then, detect inline JSON UI tokens like {"ui":"condition-card",...}
+        // We'll scan for occurrences of {"ui": and try to parse minimal JSON blocks.
+        const results: Array<{ start: number; end: number; obj: any }> = [];
+        const marker = '"ui"';
+        let idx = text.indexOf(marker);
+        while (idx !== -1) {
+          // Find the nearest preceding '{' and following '}' to try JSON.parse
+          let start = text.lastIndexOf('{', idx);
+          let end = start >= 0 ? text.indexOf('}', idx) : -1;
+          let parsed: any = null;
+          let found = false;
+          while (start >= 0 && end >= 0 && end > start) {
+            const candidate = text.slice(start, end + 1);
+            try {
+              const obj = JSON.parse(candidate);
+              if (obj && typeof obj === 'object' && obj.ui) {
+                parsed = obj;
+                found = true;
+                break;
+              }
+            } catch {}
+            end = text.indexOf('}', end + 1);
+          }
+          if (found && parsed) {
+            results.push({ start, end: end!, obj: parsed });
+            idx = text.indexOf(marker, end! + 1);
+          } else {
+            idx = text.indexOf(marker, idx + marker.length);
+          }
+        }
+
+        if (results.length === 0) {
+          segments.push({ type: 'markdown', value: text });
+          return segments;
+        }
+
+        // Build segments around found UI tokens
+        let cursor = 0;
+        for (const r of results) {
+          if (r.start > cursor) {
+            segments.push({ type: 'markdown', value: text.slice(cursor, r.start) });
+          }
+          segments.push({ type: 'ui', value: r.obj });
+          cursor = r.end + 1;
+        }
+        if (cursor < text.length) {
+          segments.push({ type: 'markdown', value: text.slice(cursor) });
+        }
+        return segments;
       };
 
       const reconcileToolResult = async (toolName: string, args: any) => {
@@ -147,28 +240,48 @@ export default function ChatPanel({}: ChatPanelProps) {
             } else if (evt.type === 'breadcrumb') {
               const phase = evt.data?.phase;
               const toolName = evt.data?.toolName;
-              pushBreadcrumb(`${phase}: ${toolName}`);
+              pushBreadcrumb(phase, toolName);
             } else if (evt.type === 'done') {
-              // Replace the tracked streaming message with final text when possible
+              // Replace the streaming message with structured markdown + UI segments
+              const segments = extractSegments(evt.data || aggregated);
               setMessages((prev) => {
                 const updated = [...prev];
                 const idx = streamMsgIndexRef.current;
+                // remove the streaming placeholder if present
                 if (idx != null && updated[idx]) {
-                  updated[idx] = { sender: 'ai', text: evt.data };
-                } else {
-                  updated.push({ sender: 'ai', text: evt.data });
+                  updated.splice(idx, 1);
                 }
                 streamMsgIndexRef.current = null;
+                for (const seg of segments) {
+                  if (seg.type === 'markdown') {
+                    const md = seg.value?.trim();
+                    if (md) updated.push({ sender: 'ai', text: '', jsx: renderMarkdown(md) } as any);
+                  } else if (seg.type === 'ui') {
+                    pushUI(seg.value);
+                  }
+                }
                 return updated;
               });
             } else if (evt.type === 'ui') {
               pushUI(evt.data);
             } else if (evt.type === 'tool') {
-              if (evt.data?.toolName === 'addFinding') mirrorLocalFinding(evt.data?.args);
+              // no-op; avoid noisy local echoes
             } else if (evt.type === 'tool-result') {
               // Reconcile store locally so UI reflects changes immediately
               if (evt.data?.toolName) {
                 reconcileToolResult(evt.data.toolName, evt.data.args);
+              }
+            } else if (evt.type === 'stateVersion') {
+              const incoming = Number(evt.data);
+              if (!Number.isNaN(incoming) && incoming > (stateVersion ?? 0)) {
+                // re-hydrate when server reports a newer version
+                try {
+                  const res = await fetch('/api/state', { cache: 'no-store' });
+                  if (res.ok) {
+                    const snapshot = await res.json();
+                    replaceAll(snapshot);
+                  }
+                } catch {}
               }
             } else if (evt.type === 'error') {
               pushBreadcrumb(`error: ${evt.data}`);
@@ -239,7 +352,11 @@ export default function ChatPanel({}: ChatPanelProps) {
                   : "bg-slate-700 text-slate-200 rounded-bl-none"
               }`}
             >
-              <p className="whitespace-pre-wrap">{msg.text}</p>
+              {msg.jsx ? (
+                <div className="max-w-full text-slate-200">{msg.jsx}</div>
+              ) : (
+                <p className="whitespace-pre-wrap">{msg.text}</p>
+              )}
             </div>
           </div>
         ))}
