@@ -3,6 +3,14 @@
 import { useState, FormEvent, useRef, useEffect } from 'react';
 import { HealthData } from '@/app/page';
 import { SendHorizonal } from 'lucide-react';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface Message {
   sender: 'user' | 'ai';
@@ -27,6 +35,7 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,10 +77,41 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
     }
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    console.log("User logged out of the session.");
+  };
+
   return (
     <div className="flex flex-col h-full bg-slate-800 rounded-xl border border-pink-500/30 shadow-lg shadow-pink-500/10 p-6">
 
-      <h2 className="text-2xl font-bold mb-4 text-slate-100 flex-shrink-0">MapMyHealth</h2>
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+        <h2 className="text-2xl font-bold text-slate-100">MapMyHealth</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="bg-white text-black hover:bg-gray-100 text-sm">
+              Create New File
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent 
+              className="w-48 bg-white p-2 rounded-lg shadow-lg border border-gray-200 z-[9999]"
+              side="bottom"
+              align="end"
+              sideOffset={8}
+            >
+              <DropdownMenuItem onClick={() => console.log("Create New File clicked")}>
+                Create New File
+              </DropdownMenuItem>
+              {isLoggedIn && (
+                <DropdownMenuItem onSelect={handleLogout}>
+                  Log Out
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenu>
+      </div>
 
       <div className="flex-grow overflow-y-auto mb-4 pr-2">
         {messages.map((msg, index) => (
