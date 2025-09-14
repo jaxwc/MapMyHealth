@@ -67,7 +67,7 @@ export interface HealthState {
   engineRecommendation?: string;
 
   // Escalation state
-  escalationResult?: import('../../engine/types').EscalationResult;
+  escalationResult?: import('../../engine/escalation').EscalationResult;
 
   // User preferences
   costWeights?: CostWeights;
@@ -80,6 +80,9 @@ export interface HealthState {
 
   // Metadata
   lastEvaluatedAt?: string;
+
+  // Versioning for synchronization
+  stateVersion?: number;
 }
 
 /**
@@ -96,6 +99,10 @@ export interface HealthCommands {
   getActionOutcomes(actionId: string): { outcomes: any[] } | null;
   setCostWeights(w: CostWeights): Promise<void>;
   applyActionOutcome(actionId: string, outcomeId: string): Promise<void>;
+
+  // Synchronization utilities
+  replaceAll(next: HealthState): void;
+  resetAll(): Promise<void>;
 }
 
 /**

@@ -3,8 +3,12 @@
     "id": "streptococcal_pharyngitis",
     "label": "Streptococcal pharyngitis",
     "description": "Bacterial infection of the pharynx caused by group A Streptococcus",
+    "contexts": ["throat_pain", "ent_respiratory"],
+    "activationRules": {
+      "requireAny": ["sore_throat", "severe_sore_throat_unilateral"]
+    },
     "priors": {
-      "default": 0.15,
+      "default": 0.25,
       "byDemo": [
         {
           "ageRange": { "min": 3, "max": 14 },
@@ -21,22 +25,22 @@
       ]
     },
     "thresholds": {
-      "confirm": 0.80,
-      "likely": 0.40,
-      "leadDelta": 0.20
+      "confirm": 0.60,
+      "likely": 0.25,
+      "leadDelta": 0.15
     },
     "probabilityBands": [
-      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.05 },
-      { "category": "not-likely", "minInclusive": 0.05, "maxExclusive": 0.20 },
-      { "category": "possible", "minInclusive": 0.20, "maxExclusive": 0.60 },
-      { "category": "likely", "minInclusive": 0.60, "maxExclusive": 0.80 },
-      { "category": "highly-likely", "minInclusive": 0.80, "maxExclusive": 1.01 }
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
     ],
     "lrTable": [
       {
         "target": "tonsillar_exudates",
-        "LRpos": 2.1,
-        "LRneg": 0.6,
+        "LRpos": 3.5,
+        "LRneg": 0.4,
         "note": "Moderate predictor of strep",
         "source": {
           "source": "Centor Criteria",
@@ -45,8 +49,8 @@
       },
       {
         "target": "tender_cervical_nodes",
-        "LRpos": 2.1,
-        "LRneg": 0.6,
+        "LRpos": 3.5,
+        "LRneg": 0.4,
         "note": "Moderate predictor of strep",
         "source": {
           "source": "Centor Criteria",
@@ -136,8 +140,12 @@
     "id": "viral_pharyngitis",
     "label": "Viral pharyngitis",
     "description": "Viral infection of the pharynx, most commonly caused by rhinovirus, adenovirus, or coronavirus",
+    "contexts": ["ENT", "respiratory", "infectious"],
+    "activationRules": {
+      "requireAny": ["sore_throat", "cough", "runny_nose"]
+    },
     "priors": {
-      "default": 0.70,
+      "default": 0.45,
       "byDemo": [
         {
           "ageRange": { "min": 3, "max": 14 },
@@ -159,11 +167,11 @@
       "leadDelta": 0.15
     },
     "probabilityBands": [
-      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.05 },
-      { "category": "not-likely", "minInclusive": 0.05, "maxExclusive": 0.20 },
-      { "category": "possible", "minInclusive": 0.20, "maxExclusive": 0.60 },
-      { "category": "likely", "minInclusive": 0.60, "maxExclusive": 0.80 },
-      { "category": "highly-likely", "minInclusive": 0.80, "maxExclusive": 1.01 }
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
     ],
     "lrTable": [
       {
@@ -219,6 +227,10 @@
     "id": "infectious_mononucleosis",
     "label": "Infectious mononucleosis",
     "description": "Viral infection caused by Epstein-Barr virus, characterized by fever, fatigue, and pharyngitis",
+    "contexts": ["ENT", "infectious", "systemic"],
+    "activationRules": {
+      "requireAny": ["sore_throat", "fever", "tender_cervical_nodes", "fatigue"]
+    },
     "priors": {
       "default": 0.10,
       "byDemo": [
@@ -242,11 +254,11 @@
       "leadDelta": 0.20
     },
     "probabilityBands": [
-      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.05 },
-      { "category": "not-likely", "minInclusive": 0.05, "maxExclusive": 0.20 },
-      { "category": "possible", "minInclusive": 0.20, "maxExclusive": 0.60 },
-      { "category": "likely", "minInclusive": 0.60, "maxExclusive": 0.80 },
-      { "category": "highly-likely", "minInclusive": 0.80, "maxExclusive": 1.01 }
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
     ],
     "lrTable": [
       {
@@ -304,6 +316,2211 @@
       "highly-likely": "supportive-care",
       "likely": "supportive-care",
       "possible": "watchful-waiting",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "viral_gastroenteritis",
+    "label": "Viral gastroenteritis",
+    "description": "Viral infection of the gastrointestinal tract causing diarrhea, vomiting, and cramping",
+    "contexts": ["GI", "infectious"],
+    "activationRules": {
+      "requireAny": ["diarrhea", "vomiting", "nausea", "abdominal_pain"]
+    },
+    "priors": {
+      "default": 0.40,
+      "byDemo": [
+        {
+          "ageRange": { "min": 2, "max": 17 },
+          "prior": 0.60
+        },
+        {
+          "ageRange": { "min": 18, "max": 64 },
+          "prior": 0.35
+        },
+        {
+          "ageRange": { "min": 65 },
+          "prior": 0.30
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.15
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "diarrhea",
+        "LRpos": 4.2,
+        "LRneg": 0.1,
+        "note": "Diarrhea is hallmark of gastroenteritis",
+        "source": {
+          "source": "Acute Gastroenteritis Guidelines",
+          "year": 2017
+        }
+      },
+      {
+        "target": "vomiting",
+        "LRpos": 2.8,
+        "LRneg": 0.4,
+        "note": "Vomiting common in viral gastroenteritis",
+        "source": {
+          "source": "Viral GI Illness Features",
+          "year": 2019
+        }
+      },
+      {
+        "target": "fever",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Fever supports infectious etiology",
+        "source": {
+          "source": "Infectious vs Non-infectious GI",
+          "year": 2018
+        }
+      },
+      {
+        "target": "bloody_diarrhea",
+        "LRpos": 0.2,
+        "LRneg": 3.5,
+        "note": "Bloody diarrhea suggests bacterial cause",
+        "source": {
+          "source": "Bacterial vs Viral Gastroenteritis",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "supportive-care",
+      "likely": "supportive-care",
+      "possible": "watchful-waiting",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "acute_appendicitis",
+    "label": "Acute appendicitis",
+    "description": "Inflammation of the vermiform appendix requiring urgent surgical evaluation",
+    "contexts": ["GI", "abdominal", "surgical"],
+    "activationRules": {
+      "requireAny": ["rlq_pain", "periumbilical_pain_migrates_rlq", "abdominal_pain"]
+    },
+    "priors": {
+      "default": 0.20,
+      "byDemo": [
+        {
+          "ageRange": { "min": 10, "max": 19 },
+          "prior": 0.25
+        },
+        {
+          "ageRange": { "min": 20, "max": 39 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 40 },
+          "prior": 0.08
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "periumbilical_pain_migrates_rlq",
+        "LRpos": 8.2,
+        "LRneg": 0.3,
+        "note": "Classic migration pattern highly suggestive",
+        "source": {
+          "source": "Appendicitis Clinical Features Meta-analysis",
+          "year": 2020
+        }
+      },
+      {
+        "target": "mcburney_point_tenderness",
+        "LRpos": 6.8,
+        "LRneg": 0.4,
+        "note": "Point tenderness at McBurney's point",
+        "source": {
+          "source": "Physical Exam Findings Appendicitis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "rebound_guarding",
+        "LRpos": 4.5,
+        "LRneg": 0.5,
+        "note": "Peritoneal irritation sign",
+        "source": {
+          "source": "Appendicitis Physical Exam",
+          "year": 2018
+        }
+      },
+      {
+        "target": "ct_abdomen_appendicitis_findings",
+        "LRpos": 25.0,
+        "LRneg": 0.05,
+        "note": "CT highly accurate for appendicitis",
+        "source": {
+          "source": "CT Appendicitis Diagnostic Accuracy",
+          "year": 2021
+        }
+      },
+      {
+        "target": "cbc_leukocytosis",
+        "LRpos": 2.3,
+        "LRneg": 0.6,
+        "note": "Elevated WBC supports inflammation",
+        "source": {
+          "source": "Lab Values in Appendicitis",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "urgent-care",
+      "likely": "urgent-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "peptic_ulcer_disease",
+    "label": "Peptic ulcer disease",
+    "description": "Ulceration of gastric or duodenal mucosa, often associated with H. pylori or NSAIDs",
+    "contexts": ["GI", "gastric"],
+    "activationRules": {
+      "requireAny": ["epigastric_pain", "abdominal_pain", "heartburn"]
+    },
+    "priors": {
+      "default": 0.18,
+      "byDemo": [
+        {
+          "ageRange": { "min": 20, "max": 39 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.22
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.28
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.20
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "epigastric_pain",
+        "LRpos": 3.8,
+        "LRneg": 0.2,
+        "note": "Epigastric pain typical location",
+        "source": {
+          "source": "PUD Clinical Presentation",
+          "year": 2019
+        }
+      },
+      {
+        "target": "h_pylori_breath_positive",
+        "LRpos": 12.5,
+        "LRneg": 0.15,
+        "note": "H. pylori strongly associated with PUD",
+        "source": {
+          "source": "H. pylori Testing Meta-analysis",
+          "year": 2020
+        }
+      },
+      {
+        "target": "melena",
+        "LRpos": 8.9,
+        "LRneg": 0.4,
+        "note": "Upper GI bleeding suggests ulcer",
+        "source": {
+          "source": "Upper GI Bleeding Etiology",
+          "year": 2018
+        }
+      },
+      {
+        "target": "nsaid_use",
+        "LRpos": 4.2,
+        "LRneg": 0.6,
+        "note": "NSAIDs major risk factor",
+        "source": {
+          "source": "NSAID-Induced PUD",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "gastroesophageal_reflux_disease",
+    "label": "Gastroesophageal reflux disease (GERD)",
+    "description": "Chronic acid reflux causing symptoms and/or mucosal damage",
+    "contexts": ["GI", "esophageal"],
+    "activationRules": {
+      "requireAny": ["heartburn", "regurgitation", "nocturnal_symptoms"]
+    },
+    "priors": {
+      "default": 0.22,
+      "byDemo": [
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.25
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.35
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.75,
+      "likely": 0.45,
+      "leadDelta": 0.15
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "heartburn",
+        "LRpos": 5.2,
+        "LRneg": 0.2,
+        "note": "Heartburn is pathognomonic symptom",
+        "source": {
+          "source": "GERD Symptom Analysis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "regurgitation",
+        "LRpos": 4.8,
+        "LRneg": 0.3,
+        "note": "Acid regurgitation highly specific",
+        "source": {
+          "source": "GERD Clinical Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "nocturnal_symptoms",
+        "LRpos": 3.1,
+        "LRneg": 0.5,
+        "note": "Nocturnal reflux suggests severe GERD",
+        "source": {
+          "source": "Nocturnal GERD Study",
+          "year": 2018
+        }
+      },
+      {
+        "target": "response_to_ppi",
+        "LRpos": 6.8,
+        "LRneg": 0.2,
+        "note": "PPI response supports GERD diagnosis",
+        "source": {
+          "source": "PPI Test for GERD",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "supportive-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "acute_cholecystitis",
+    "label": "Acute cholecystitis",
+    "description": "Acute inflammation of the gallbladder, usually due to gallstone impaction",
+    "contexts": ["GI", "hepatobiliary"],
+    "activationRules": {
+      "requireAny": ["ruq_pain", "postprandial_ruq_pain", "abdominal_pain"]
+    },
+    "priors": {
+      "default": 0.08,
+      "byDemo": [
+        {
+          "ageRange": { "min": 20, "max": 39 },
+          "prior": 0.04
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.10
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.15
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "murphy_sign_positive",
+        "LRpos": 8.7,
+        "LRneg": 0.3,
+        "note": "Murphy's sign highly suggestive",
+        "source": {
+          "source": "Murphy Sign Diagnostic Accuracy",
+          "year": 2020
+        }
+      },
+      {
+        "target": "ruq_pain",
+        "LRpos": 4.2,
+        "LRneg": 0.1,
+        "note": "RUQ pain expected in cholecystitis",
+        "source": {
+          "source": "Acute Cholecystitis Presentation",
+          "year": 2019
+        }
+      },
+      {
+        "target": "ultrasound_cholecystitis_wall_thickening",
+        "LRpos": 15.2,
+        "LRneg": 0.2,
+        "note": "Ultrasound findings highly diagnostic",
+        "source": {
+          "source": "Ultrasound Cholecystitis Diagnosis",
+          "year": 2021
+        }
+      },
+      {
+        "target": "fever",
+        "LRpos": 2.8,
+        "LRneg": 0.4,
+        "note": "Fever suggests acute inflammation",
+        "source": {
+          "source": "Acute vs Chronic Cholecystitis",
+          "year": 2018
+        }
+      },
+      {
+        "target": "cbc_leukocytosis",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Elevated WBC supports inflammation",
+        "source": {
+          "source": "Lab Values Acute Cholecystitis",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "urgent-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "biliary_colic",
+    "label": "Biliary colic",
+    "description": "Intermittent pain due to gallstone obstruction without inflammation",
+    "contexts": ["GI", "hepatobiliary"],
+    "activationRules": {
+      "requireAny": ["ruq_pain", "postprandial_ruq_pain", "epigastric_pain"]
+    },
+    "priors": {
+      "default": 0.12,
+      "byDemo": [
+        {
+          "ageRange": { "min": 20, "max": 39 },
+          "prior": 0.08
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.18
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.20
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "postprandial_ruq_pain",
+        "LRpos": 6.8,
+        "LRneg": 0.2,
+        "note": "Postprandial RUQ pain classic for biliary colic",
+        "source": {
+          "source": "Biliary Colic Clinical Features",
+          "year": 2019
+        }
+      },
+      {
+        "target": "abdominal_ultrasound_gallstones",
+        "LRpos": 12.5,
+        "LRneg": 0.3,
+        "note": "Gallstones on ultrasound support diagnosis",
+        "source": {
+          "source": "Gallstone Detection Ultrasound",
+          "year": 2020
+        }
+      },
+      {
+        "target": "nausea",
+        "LRpos": 2.2,
+        "LRneg": 0.6,
+        "note": "Nausea common with biliary pain",
+        "source": {
+          "source": "Biliary vs Non-biliary Pain",
+          "year": 2018
+        }
+      },
+      {
+        "target": "murphy_sign_positive",
+        "LRpos": 0.4,
+        "LRneg": 2.1,
+        "note": "Murphy's sign suggests acute cholecystitis",
+        "source": {
+          "source": "Biliary Colic vs Acute Cholecystitis",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "acute_pancreatitis",
+    "label": "Acute pancreatitis",
+    "description": "Acute inflammation of the pancreas, commonly due to gallstones or alcohol",
+    "contexts": ["GI", "pancreatic"],
+    "activationRules": {
+      "requireAny": ["epigastric_pain", "abdominal_pain", "nausea", "vomiting"]
+    },
+    "priors": {
+      "default": 0.05,
+      "byDemo": [
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.08
+        },
+        {
+          "ageRange": { "min": 50, "max": 69 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 70 },
+          "prior": 0.15
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.90,
+      "likely": 0.70,
+      "leadDelta": 0.30
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "epigastric_pain",
+        "LRpos": 4.5,
+        "LRneg": 0.1,
+        "note": "Severe epigastric pain characteristic",
+        "source": {
+          "source": "Acute Pancreatitis Presentation",
+          "year": 2020
+        }
+      },
+      {
+        "target": "lipase_elevated",
+        "LRpos": 18.2,
+        "LRneg": 0.05,
+        "note": "Elevated lipase highly diagnostic",
+        "source": {
+          "source": "Pancreatic Enzymes Diagnostic Accuracy",
+          "year": 2019
+        }
+      },
+      {
+        "target": "amylase_elevated",
+        "LRpos": 8.5,
+        "LRneg": 0.2,
+        "note": "Elevated amylase supports diagnosis",
+        "source": {
+          "source": "Amylase vs Lipase Pancreatitis",
+          "year": 2018
+        }
+      },
+      {
+        "target": "nausea",
+        "LRpos": 2.8,
+        "LRneg": 0.3,
+        "note": "Nausea common in pancreatitis",
+        "source": {
+          "source": "Pancreatitis Symptom Profile",
+          "year": 2019
+        }
+      },
+      {
+        "target": "vomiting",
+        "LRpos": 2.5,
+        "LRneg": 0.4,
+        "note": "Vomiting frequent in acute pancreatitis",
+        "source": {
+          "source": "Acute Pancreatitis Clinical Features",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "urgent-care",
+      "likely": "urgent-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "diverticulitis",
+    "label": "Diverticulitis",
+    "description": "Inflammation of colonic diverticula, typically affecting sigmoid colon",
+    "contexts": ["GI", "colonic"],
+    "activationRules": {
+      "requireAny": ["llq_pain", "abdominal_pain", "fever"]
+    },
+    "priors": {
+      "default": 0.06,
+      "byDemo": [
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.08
+        },
+        {
+          "ageRange": { "min": 60, "max": 79 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 80 },
+          "prior": 0.22
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.65,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "llq_pain",
+        "LRpos": 5.8,
+        "LRneg": 0.2,
+        "note": "Left lower quadrant pain typical",
+        "source": {
+          "source": "Diverticulitis Clinical Presentation",
+          "year": 2020
+        }
+      },
+      {
+        "target": "ct_abdomen_diverticulitis_findings",
+        "LRpos": 22.0,
+        "LRneg": 0.08,
+        "note": "CT highly accurate for diverticulitis",
+        "source": {
+          "source": "CT Diverticulitis Diagnostic Accuracy",
+          "year": 2021
+        }
+      },
+      {
+        "target": "fever",
+        "LRpos": 3.2,
+        "LRneg": 0.4,
+        "note": "Fever suggests acute inflammation",
+        "source": {
+          "source": "Complicated vs Uncomplicated Diverticulitis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "cbc_leukocytosis",
+        "LRpos": 2.5,
+        "LRneg": 0.5,
+        "note": "Elevated WBC supports inflammation",
+        "source": {
+          "source": "Lab Values Diverticulitis",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "irritable_bowel_syndrome",
+    "label": "Irritable bowel syndrome (IBS)",
+    "description": "Functional bowel disorder with abdominal pain and altered bowel habits",
+    "contexts": ["GI", "functional"],
+    "activationRules": {
+      "requireAny": ["abdominal_pain", "alternating_bowel_habits", "bloating", "abdominal_pain_relieved_defecation"]
+    },
+    "priors": {
+      "default": 0.15,
+      "byDemo": [
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.20
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.08
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.75,
+      "likely": 0.50,
+      "leadDelta": 0.15
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "abdominal_pain_relieved_defecation",
+        "LRpos": 4.8,
+        "LRneg": 0.3,
+        "note": "Pain relief with defecation characteristic",
+        "source": {
+          "source": "Rome IV Criteria IBS",
+          "year": 2016
+        }
+      },
+      {
+        "target": "bloating",
+        "LRpos": 3.2,
+        "LRneg": 0.4,
+        "note": "Bloating very common in IBS",
+        "source": {
+          "source": "IBS Symptom Prevalence",
+          "year": 2019
+        }
+      },
+      {
+        "target": "alternating_bowel_habits",
+        "LRpos": 2.8,
+        "LRneg": 0.5,
+        "note": "Alternating diarrhea/constipation typical",
+        "source": {
+          "source": "IBS Bowel Pattern Analysis",
+          "year": 2018
+        }
+      },
+      {
+        "target": "alarm_symptoms_absent",
+        "LRpos": 3.5,
+        "LRneg": 0.2,
+        "note": "Absence of alarm symptoms supports IBS",
+        "source": {
+          "source": "IBS vs Organic Disease",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "supportive-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "crohn_disease",
+    "label": "Crohn's disease",
+    "description": "Chronic inflammatory bowel disease affecting any part of GI tract",
+    "contexts": ["GI", "inflammatory"],
+    "activationRules": {
+      "requireAny": ["diarrhea", "abdominal_pain", "weight_loss_unintentional"]
+    },
+    "priors": {
+      "default": 0.03,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 29 },
+          "prior": 0.08
+        },
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.05
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.02
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "weight_loss_unintentional",
+        "LRpos": 6.2,
+        "LRneg": 0.3,
+        "note": "Unintentional weight loss suggests IBD",
+        "source": {
+          "source": "IBD Clinical Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "perianal_disease",
+        "LRpos": 8.5,
+        "LRneg": 0.4,
+        "note": "Perianal disease highly specific for Crohn's",
+        "source": {
+          "source": "Crohn's vs UC Features",
+          "year": 2019
+        }
+      },
+      {
+        "target": "fecal_calprotectin_elevated",
+        "LRpos": 12.0,
+        "LRneg": 0.1,
+        "note": "Elevated calprotectin indicates inflammation",
+        "source": {
+          "source": "Calprotectin IBD Diagnosis",
+          "year": 2021
+        }
+      },
+      {
+        "target": "crp_elevated",
+        "LRpos": 3.8,
+        "LRneg": 0.4,
+        "note": "Elevated CRP suggests active inflammation",
+        "source": {
+          "source": "Inflammatory Markers IBD",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "ulcerative_colitis",
+    "label": "Ulcerative colitis",
+    "description": "Chronic inflammatory bowel disease limited to colon and rectum",
+    "contexts": ["GI", "inflammatory"],
+    "activationRules": {
+      "requireAny": ["diarrhea", "tenesmus", "urgency"]
+    },
+    "priors": {
+      "default": 0.03,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 29 },
+          "prior": 0.06
+        },
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.04
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.02
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "bloody_diarrhea",
+        "LRpos": 7.8,
+        "LRneg": 0.2,
+        "note": "Bloody diarrhea characteristic of UC",
+        "source": {
+          "source": "UC Clinical Presentation",
+          "year": 2020
+        }
+      },
+      {
+        "target": "tenesmus",
+        "LRpos": 5.2,
+        "LRneg": 0.4,
+        "note": "Tenesmus suggests rectal involvement",
+        "source": {
+          "source": "UC Symptom Analysis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "fecal_calprotectin_elevated",
+        "LRpos": 12.0,
+        "LRneg": 0.1,
+        "note": "Elevated calprotectin indicates inflammation",
+        "source": {
+          "source": "Calprotectin IBD Diagnosis",
+          "year": 2021
+        }
+      },
+      {
+        "target": "urgency",
+        "LRpos": 4.1,
+        "LRneg": 0.3,
+        "note": "Urgency common in active UC",
+        "source": {
+          "source": "UC Bowel Urgency Study",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "celiac_disease",
+    "label": "Celiac disease",
+    "description": "Autoimmune disorder triggered by gluten ingestion causing small bowel inflammation",
+    "contexts": ["GI", "autoimmune"],
+    "activationRules": {
+      "requireAny": ["diarrhea", "abdominal_pain", "bloating", "weight_loss_unintentional"]
+    },
+    "priors": {
+      "default": 0.01,
+      "byDemo": [
+        {
+          "ageRange": { "min": 2, "max": 17 },
+          "prior": 0.02
+        },
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.015
+        },
+        {
+          "ageRange": { "min": 40 },
+          "prior": 0.008
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.90,
+      "likely": 0.70,
+      "leadDelta": 0.30
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "ttg_iga_positive",
+        "LRpos": 25.0,
+        "LRneg": 0.05,
+        "note": "TTG-IgA highly specific for celiac",
+        "source": {
+          "source": "Celiac Serology Meta-analysis",
+          "year": 2021
+        }
+      },
+      {
+        "target": "chronic_diarrhea",
+        "LRpos": 4.2,
+        "LRneg": 0.3,
+        "note": "Chronic diarrhea common in celiac",
+        "source": {
+          "source": "Celiac Clinical Presentation",
+          "year": 2019
+        }
+      },
+      {
+        "target": "weight_loss_unintentional",
+        "LRpos": 3.8,
+        "LRneg": 0.4,
+        "note": "Weight loss due to malabsorption",
+        "source": {
+          "source": "Celiac Malabsorption Study",
+          "year": 2020
+        }
+      },
+      {
+        "target": "iron_deficiency_anemia",
+        "LRpos": 2.9,
+        "LRneg": 0.5,
+        "note": "Iron deficiency from malabsorption",
+        "source": {
+          "source": "Celiac Anemia Association",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "acute_bacterial_sinusitis",
+    "label": "Acute bacterial sinusitis",
+    "description": "Bacterial infection of paranasal sinuses, typically following viral upper respiratory infection",
+    "contexts": ["ENT", "infectious"],
+    "activationRules": {
+      "requireAny": ["facial_pain_pressure", "purulent_nasal_discharge", "nasal_congestion"]
+    },
+    "priors": {
+      "default": 0.08,
+      "byDemo": [
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.10
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.06
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.20
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "purulent_nasal_discharge",
+        "LRpos": 4.5,
+        "LRneg": 0.3,
+        "note": "Purulent discharge suggests bacterial infection",
+        "source": {
+          "source": "Bacterial Sinusitis Diagnosis",
+          "year": 2020
+        }
+      },
+      {
+        "target": "facial_pain_pressure",
+        "LRpos": 3.2,
+        "LRneg": 0.4,
+        "note": "Facial pain/pressure characteristic",
+        "source": {
+          "source": "Sinusitis Clinical Features",
+          "year": 2019
+        }
+      },
+      {
+        "target": "maxillary_tenderness",
+        "LRpos": 2.8,
+        "LRneg": 0.5,
+        "note": "Maxillary tenderness on exam",
+        "source": {
+          "source": "Sinusitis Physical Exam",
+          "year": 2018
+        }
+      },
+      {
+        "target": "symptoms_duration_over_10_days",
+        "LRpos": 3.5,
+        "LRneg": 0.4,
+        "note": "Prolonged symptoms suggest bacterial",
+        "source": {
+          "source": "Viral vs Bacterial Sinusitis",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "allergic_rhinitis",
+    "label": "Allergic rhinitis",
+    "description": "IgE-mediated inflammatory response to environmental allergens affecting nasal mucosa",
+    "contexts": ["ENT", "respiratory", "allergic"],
+    "activationRules": {
+      "requireAny": ["runny_nose", "nasal_congestion", "sneezing_fits"]
+    },
+    "priors": {
+      "default": 0.25,
+      "byDemo": [
+        {
+          "ageRange": { "min": 5, "max": 17 },
+          "prior": 0.35
+        },
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.30
+        },
+        {
+          "ageRange": { "min": 40 },
+          "prior": 0.20
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.75,
+      "likely": 0.45,
+      "leadDelta": 0.15
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "nasal_congestion",
+        "LRpos": 3.8,
+        "LRneg": 0.2,
+        "note": "Nasal congestion hallmark symptom",
+        "source": {
+          "source": "Allergic Rhinitis Symptoms",
+          "year": 2020
+        }
+      },
+      {
+        "target": "sneezing_fits",
+        "LRpos": 4.2,
+        "LRneg": 0.3,
+        "note": "Paroxysmal sneezing characteristic",
+        "source": {
+          "source": "AR vs Infectious Rhinitis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "clear_rhinorrhea",
+        "LRpos": 2.9,
+        "LRneg": 0.4,
+        "note": "Clear nasal discharge typical",
+        "source": {
+          "source": "Allergic vs Infectious Rhinitis",
+          "year": 2018
+        }
+      },
+      {
+        "target": "seasonal_pattern",
+        "LRpos": 5.5,
+        "LRneg": 0.2,
+        "note": "Seasonal pattern suggests allergen trigger",
+        "source": {
+          "source": "Seasonal vs Perennial AR",
+          "year": 2021
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "supportive-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "laryngitis",
+    "label": "Laryngitis",
+    "description": "Inflammation of the larynx causing hoarseness, typically viral in origin",
+    "contexts": ["ENT", "respiratory"],
+    "activationRules": {
+      "requireAny": ["hoarseness_voice_change", "voice_loss", "sore_throat"]
+    },
+    "priors": {
+      "default": 0.15,
+      "byDemo": [
+        {
+          "ageRange": { "min": 18, "max": 39 },
+          "prior": 0.20
+        },
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.18
+        },
+        {
+          "ageRange": { "min": 60 },
+          "prior": 0.12
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.80,
+      "likely": 0.50,
+      "leadDelta": 0.20
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "hoarseness_voice_change",
+        "LRpos": 8.5,
+        "LRneg": 0.1,
+        "note": "Hoarseness pathognomonic for laryngitis",
+        "source": {
+          "source": "Laryngitis Clinical Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "voice_loss",
+        "LRpos": 6.2,
+        "LRneg": 0.3,
+        "note": "Complete voice loss in severe cases",
+        "source": {
+          "source": "Acute Laryngitis Presentation",
+          "year": 2019
+        }
+      },
+      {
+        "target": "dry_cough",
+        "LRpos": 2.8,
+        "LRneg": 0.5,
+        "note": "Dry cough common in laryngitis",
+        "source": {
+          "source": "Laryngitis Associated Symptoms",
+          "year": 2018
+        }
+      },
+      {
+        "target": "throat_clearing",
+        "LRpos": 2.1,
+        "LRneg": 0.6,
+        "note": "Frequent throat clearing attempts",
+        "source": {
+          "source": "Laryngeal Irritation Symptoms",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "supportive-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "influenza",
+    "label": "Influenza",
+    "description": "Viral respiratory infection caused by influenza A or B virus",
+    "contexts": ["respiratory", "infectious", "systemic"],
+    "activationRules": {
+      "requireAny": ["fever", "cough", "myalgias", "fatigue"]
+    },
+    "priors": {
+      "default": 0.12,
+      "byDemo": [
+        {
+          "seasonalRange": { "months": [11, 12, 1, 2, 3] },
+          "prior": 0.25
+        },
+        {
+          "ageRange": { "min": 5, "max": 64 },
+          "prior": 0.15
+        },
+        {
+          "ageRange": { "min": 65 },
+          "prior": 0.20
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "myalgias",
+        "LRpos": 4.8,
+        "LRneg": 0.2,
+        "note": "Myalgias characteristic of influenza",
+        "source": {
+          "source": "Influenza Clinical Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "fever",
+        "LRpos": 3.5,
+        "LRneg": 0.3,
+        "note": "Fever common but not universal",
+        "source": {
+          "source": "Influenza vs Common Cold",
+          "year": 2019
+        }
+      },
+      {
+        "target": "rapid_influenza_positive",
+        "LRpos": 12.0,
+        "LRneg": 0.2,
+        "note": "Rapid influenza test positive",
+        "source": {
+          "source": "Rapid Influenza Test Accuracy",
+          "year": 2021
+        }
+      },
+      {
+        "target": "sudden_onset",
+        "LRpos": 2.9,
+        "LRneg": 0.4,
+        "note": "Abrupt onset typical of influenza",
+        "source": {
+          "source": "Influenza Onset Pattern",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "covid_19",
+    "label": "COVID-19",
+    "description": "Respiratory illness caused by SARS-CoV-2 coronavirus",
+    "contexts": ["respiratory", "infectious", "systemic"],
+    "activationRules": {
+      "requireAny": ["cough", "fever", "anosmia_ageusia", "fatigue"]
+    },
+    "priors": {
+      "default": 0.10,
+      "byDemo": [
+        {
+          "ageRange": { "min": 18, "max": 64 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 65 },
+          "prior": 0.15
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.90,
+      "likely": 0.70,
+      "leadDelta": 0.30
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "anosmia_ageusia",
+        "LRpos": 8.5,
+        "LRneg": 0.2,
+        "note": "Loss of smell/taste highly specific",
+        "source": {
+          "source": "COVID-19 Olfactory Symptoms",
+          "year": 2021
+        }
+      },
+      {
+        "target": "sars_cov2_antigen_positive",
+        "LRpos": 25.0,
+        "LRneg": 0.1,
+        "note": "Positive antigen test highly specific",
+        "source": {
+          "source": "COVID-19 Antigen Test Performance",
+          "year": 2022
+        }
+      },
+      {
+        "target": "dry_cough",
+        "LRpos": 2.8,
+        "LRneg": 0.4,
+        "note": "Dry cough common in COVID-19",
+        "source": {
+          "source": "COVID-19 Symptom Profile",
+          "year": 2021
+        }
+      },
+      {
+        "target": "fatigue",
+        "LRpos": 2.1,
+        "LRneg": 0.5,
+        "note": "Fatigue frequent symptom",
+        "source": {
+          "source": "COVID-19 Clinical Features",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "supportive-care",
+      "possible": "supportive-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "peritonsillar_abscess",
+    "label": "Peritonsillar abscess",
+    "description": "Collection of pus in peritonsillar space, serious complication of tonsillitis",
+    "priors": {
+      "default": 0.02,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 29 },
+          "prior": 0.05
+        },
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.03
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.01
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.90,
+      "likely": 0.70,
+      "leadDelta": 0.30
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "trismus",
+        "LRpos": 12.5,
+        "LRneg": 0.1,
+        "note": "Trismus highly suggestive of PTA",
+        "source": {
+          "source": "Peritonsillar Abscess Diagnosis",
+          "year": 2020
+        }
+      },
+      {
+        "target": "uvular_deviation",
+        "LRpos": 15.0,
+        "LRneg": 0.05,
+        "note": "Uvular deviation pathognomonic",
+        "source": {
+          "source": "PTA Physical Exam Findings",
+          "year": 2019
+        }
+      },
+      {
+        "target": "hot_potato_voice",
+        "LRpos": 8.2,
+        "LRneg": 0.2,
+        "note": "Muffled voice characteristic",
+        "source": {
+          "source": "PTA Clinical Presentation",
+          "year": 2018
+        }
+      },
+      {
+        "target": "severe_sore_throat_unilateral",
+        "LRpos": 6.5,
+        "LRneg": 0.3,
+        "note": "Severe unilateral throat pain",
+        "source": {
+          "source": "PTA vs Simple Pharyngitis",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "urgent-care",
+      "likely": "urgent-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "epiglottitis",
+    "label": "Epiglottitis",
+    "description": "Acute inflammation of epiglottis, potentially life-threatening airway emergency",
+    "priors": {
+      "default": 0.005,
+      "byDemo": [
+        {
+          "ageRange": { "min": 2, "max": 6 },
+          "prior": 0.01
+        },
+        {
+          "ageRange": { "min": 18, "max": 49 },
+          "prior": 0.008
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.003
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.95,
+      "likely": 0.80,
+      "leadDelta": 0.40
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "stridor",
+        "LRpos": 20.0,
+        "LRneg": 0.02,
+        "note": "Stridor indicates airway compromise",
+        "source": {
+          "source": "Epiglottitis Airway Signs",
+          "year": 2019
+        }
+      },
+      {
+        "target": "drooling",
+        "LRpos": 15.5,
+        "LRneg": 0.1,
+        "note": "Drooling due to inability to swallow",
+        "source": {
+          "source": "Epiglottitis Clinical Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "tripod_position",
+        "LRpos": 12.8,
+        "LRneg": 0.15,
+        "note": "Tripod positioning to maintain airway",
+        "source": {
+          "source": "Epiglottitis Positioning",
+          "year": 2018
+        }
+      },
+      {
+        "target": "muffled_voice",
+        "LRpos": 8.0,
+        "LRneg": 0.2,
+        "note": "Voice changes due to supraglottic swelling",
+        "source": {
+          "source": "Epiglottitis Voice Changes",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "emergency-care",
+      "likely": "emergency-care",
+      "possible": "urgent-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "rheumatoid_arthritis",
+    "label": "Rheumatoid arthritis",
+    "description": "Chronic autoimmune inflammatory arthritis affecting multiple joints symmetrically",
+    "contexts": ["rheumatologic", "autoimmune", "musculoskeletal"],
+    "activationRules": {
+      "requireAny": ["joint_pain", "symmetric_small_joint_pain", "morning_stiffness_over_60min"]
+    },
+    "priors": {
+      "default": 0.02,
+      "byDemo": [
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.03
+        },
+        {
+          "ageRange": { "min": 50, "max": 69 },
+          "prior": 0.05
+        },
+        {
+          "ageRange": { "min": 70 },
+          "prior": 0.06
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "morning_stiffness_over_60min",
+        "LRpos": 6.8,
+        "LRneg": 0.3,
+        "note": "Prolonged morning stiffness characteristic",
+        "source": {
+          "source": "RA Classification Criteria",
+          "year": 2010
+        }
+      },
+      {
+        "target": "symmetric_small_joint_pain",
+        "LRpos": 5.2,
+        "LRneg": 0.2,
+        "note": "Symmetric small joint involvement typical",
+        "source": {
+          "source": "RA Joint Pattern Analysis",
+          "year": 2019
+        }
+      },
+      {
+        "target": "rf_positive",
+        "LRpos": 8.5,
+        "LRneg": 0.4,
+        "note": "Rheumatoid factor positive",
+        "source": {
+          "source": "RF Diagnostic Performance RA",
+          "year": 2020
+        }
+      },
+      {
+        "target": "anti_ccp_positive",
+        "LRpos": 15.2,
+        "LRneg": 0.2,
+        "note": "Anti-CCP highly specific for RA",
+        "source": {
+          "source": "Anti-CCP Antibody Meta-analysis",
+          "year": 2021
+        }
+      },
+      {
+        "target": "joint_swelling",
+        "LRpos": 4.1,
+        "LRneg": 0.3,
+        "note": "Joint swelling indicates active synovitis",
+        "source": {
+          "source": "RA Physical Exam Findings",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "systemic_lupus_erythematosus",
+    "label": "Systemic lupus erythematosus (SLE)",
+    "description": "Multi-system autoimmune disease with variable organ involvement",
+    "priors": {
+      "default": 0.008,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 29 },
+          "prior": 0.015
+        },
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.012
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.005
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.90,
+      "likely": 0.70,
+      "leadDelta": 0.30
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "photosensitive_rash",
+        "LRpos": 8.2,
+        "LRneg": 0.4,
+        "note": "Photosensitive rash characteristic of SLE",
+        "source": {
+          "source": "SLE Classification Criteria",
+          "year": 2019
+        }
+      },
+      {
+        "target": "ana_positive",
+        "LRpos": 12.0,
+        "LRneg": 0.1,
+        "note": "ANA positive in >95% of SLE cases",
+        "source": {
+          "source": "ANA Testing SLE Diagnosis",
+          "year": 2020
+        }
+      },
+      {
+        "target": "anti_dsdna_positive",
+        "LRpos": 20.5,
+        "LRneg": 0.2,
+        "note": "Anti-dsDNA highly specific for SLE",
+        "source": {
+          "source": "Anti-dsDNA SLE Specificity",
+          "year": 2021
+        }
+      },
+      {
+        "target": "oral_nasal_ulcers",
+        "LRpos": 4.8,
+        "LRneg": 0.5,
+        "note": "Mucocutaneous ulcers common in SLE",
+        "source": {
+          "source": "SLE Mucocutaneous Features",
+          "year": 2018
+        }
+      },
+      {
+        "target": "arthritis_non_erosive",
+        "LRpos": 3.2,
+        "LRneg": 0.4,
+        "note": "Non-erosive arthritis typical",
+        "source": {
+          "source": "SLE Arthritis Characteristics",
+          "year": 2019
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "ankylosing_spondylitis",
+    "label": "Ankylosing spondylitis",
+    "description": "Chronic inflammatory arthritis primarily affecting axial skeleton",
+    "contexts": ["rheumatologic", "autoimmune", "spine"],
+    "activationRules": {
+      "requireAny": ["back_pain_inflammatory", "sacroiliac_joint_pain", "morning_stiffness_back"]
+    },
+    "priors": {
+      "default": 0.015,
+      "byDemo": [
+        {
+          "ageRange": { "min": 15, "max": 29 },
+          "prior": 0.025
+        },
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.020
+        },
+        {
+          "ageRange": { "min": 50 },
+          "prior": 0.008
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "back_pain_inflammatory",
+        "LRpos": 8.5,
+        "LRneg": 0.2,
+        "note": "Inflammatory back pain characteristic",
+        "source": {
+          "source": "AS Inflammatory Back Pain Criteria",
+          "year": 2020
+        }
+      },
+      {
+        "target": "hla_b27_positive",
+        "LRpos": 12.8,
+        "LRneg": 0.3,
+        "note": "HLA-B27 positive in 90% of AS cases",
+        "source": {
+          "source": "HLA-B27 AS Association",
+          "year": 2019
+        }
+      },
+      {
+        "target": "sacroiliac_joint_pain",
+        "LRpos": 6.2,
+        "LRneg": 0.4,
+        "note": "Sacroiliac joint involvement early feature",
+        "source": {
+          "source": "AS Early Clinical Features",
+          "year": 2018
+        }
+      },
+      {
+        "target": "morning_stiffness_back",
+        "LRpos": 4.5,
+        "LRneg": 0.3,
+        "note": "Morning stiffness improves with activity",
+        "source": {
+          "source": "AS Symptom Pattern Analysis",
+          "year": 2020
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "psoriatic_arthritis",
+    "label": "Psoriatic arthritis",
+    "description": "Inflammatory arthritis associated with psoriasis affecting joints and entheses",
+    "priors": {
+      "default": 0.012,
+      "byDemo": [
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.018
+        },
+        {
+          "ageRange": { "min": 50, "max": 69 },
+          "prior": 0.015
+        },
+        {
+          "ageRange": { "min": 70 },
+          "prior": 0.008
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "psoriasis_skin_lesions",
+        "LRpos": 12.5,
+        "LRneg": 0.1,
+        "note": "Psoriatic skin lesions highly suggestive",
+        "source": {
+          "source": "PsA Classification Criteria",
+          "year": 2019
+        }
+      },
+      {
+        "target": "dactylitis",
+        "LRpos": 9.2,
+        "LRneg": 0.3,
+        "note": "Dactylitis (sausage digits) characteristic",
+        "source": {
+          "source": "PsA Dactylitis Study",
+          "year": 2020
+        }
+      },
+      {
+        "target": "asymmetric_joint_involvement",
+        "LRpos": 4.8,
+        "LRneg": 0.4,
+        "note": "Asymmetric pattern typical of PsA",
+        "source": {
+          "source": "PsA vs RA Joint Patterns",
+          "year": 2018
+        }
+      },
+      {
+        "target": "nail_pitting",
+        "LRpos": 6.5,
+        "LRneg": 0.3,
+        "note": "Nail changes associated with PsA",
+        "source": {
+          "source": "Psoriatic Nail Disease PsA",
+          "year": 2021
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "sjogren_syndrome",
+    "label": "Sjögren's syndrome",
+    "description": "Autoimmune disease primarily affecting salivary and lacrimal glands",
+    "contexts": ["rheumatologic", "autoimmune"],
+    "activationRules": {
+      "requireAny": ["dry_eyes_dry_mouth", "joint_pain", "fatigue"]
+    },
+    "priors": {
+      "default": 0.008,
+      "byDemo": [
+        {
+          "ageRange": { "min": 40, "max": 59 },
+          "prior": 0.015
+        },
+        {
+          "ageRange": { "min": 60, "max": 79 },
+          "prior": 0.020
+        },
+        {
+          "ageRange": { "min": 80 },
+          "prior": 0.012
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "dry_eyes_dry_mouth",
+        "LRpos": 8.5,
+        "LRneg": 0.1,
+        "note": "Sicca symptoms pathognomonic",
+        "source": {
+          "source": "Sjögren's Classification Criteria",
+          "year": 2016
+        }
+      },
+      {
+        "target": "parotid_gland_enlargement",
+        "LRpos": 12.0,
+        "LRneg": 0.2,
+        "note": "Parotid swelling highly specific",
+        "source": {
+          "source": "Sjögren's Glandular Features",
+          "year": 2020
+        }
+      },
+      {
+        "target": "positive_schirmer_test",
+        "LRpos": 6.8,
+        "LRneg": 0.3,
+        "note": "Schirmer test confirms dry eyes",
+        "source": {
+          "source": "Ocular Tests Sjögren's",
+          "year": 2019
+        }
+      },
+      {
+        "target": "anti_ro_ssa_positive",
+        "LRpos": 15.5,
+        "LRneg": 0.2,
+        "note": "Anti-Ro/SSA antibodies highly specific",
+        "source": {
+          "source": "Sjögren's Autoantibodies",
+          "year": 2021
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
+      "not-likely": "watchful-waiting",
+      "very-unlikely": "watchful-waiting"
+    }
+  },
+  {
+    "id": "hashimoto_thyroiditis",
+    "label": "Hashimoto's thyroiditis",
+    "description": "Autoimmune thyroid disease causing hypothyroidism",
+    "contexts": ["endocrine", "autoimmune"],
+    "activationRules": {
+      "requireAny": ["hypothyroid_symptoms", "fatigue"]
+    },
+    "priors": {
+      "default": 0.05,
+      "byDemo": [
+        {
+          "ageRange": { "min": 30, "max": 49 },
+          "prior": 0.08
+        },
+        {
+          "ageRange": { "min": 50, "max": 69 },
+          "prior": 0.12
+        },
+        {
+          "ageRange": { "min": 70 },
+          "prior": 0.15
+        }
+      ]
+    },
+    "thresholds": {
+      "confirm": 0.85,
+      "likely": 0.60,
+      "leadDelta": 0.25
+    },
+    "probabilityBands": [
+      { "category": "very-unlikely", "minInclusive": 0.0, "maxExclusive": 0.02 },
+      { "category": "not-likely", "minInclusive": 0.02, "maxExclusive": 0.10 },
+      { "category": "possible", "minInclusive": 0.10, "maxExclusive": 0.25 },
+      { "category": "likely", "minInclusive": 0.25, "maxExclusive": 0.60 },
+      { "category": "highly-likely", "minInclusive": 0.60, "maxExclusive": 1.01 }
+    ],
+    "lrTable": [
+      {
+        "target": "tsh_high",
+        "LRpos": 12.5,
+        "LRneg": 0.1,
+        "note": "Elevated TSH indicates hypothyroidism",
+        "source": {
+          "source": "Thyroid Function Tests",
+          "year": 2020
+        }
+      },
+      {
+        "target": "tpo_antibodies_positive",
+        "LRpos": 18.2,
+        "LRneg": 0.15,
+        "note": "TPO antibodies confirm autoimmune etiology",
+        "source": {
+          "source": "TPO Antibodies Hashimoto's",
+          "year": 2021
+        }
+      },
+      {
+        "target": "goiter",
+        "LRpos": 4.5,
+        "LRneg": 0.4,
+        "note": "Goiter common but not universal",
+        "source": {
+          "source": "Hashimoto's Physical Findings",
+          "year": 2019
+        }
+      },
+      {
+        "target": "hypothyroid_symptoms",
+        "LRpos": 3.8,
+        "LRneg": 0.2,
+        "note": "Fatigue, cold intolerance, weight gain",
+        "source": {
+          "source": "Hypothyroidism Symptom Profile",
+          "year": 2018
+        }
+      }
+    ],
+    "recommendationsByBand": {
+      "highly-likely": "targeted-care",
+      "likely": "targeted-care",
+      "possible": "targeted-care",
       "not-likely": "watchful-waiting",
       "very-unlikely": "watchful-waiting"
     }

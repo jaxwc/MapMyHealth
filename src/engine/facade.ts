@@ -67,7 +67,7 @@ export interface ActionOutcome {
   effects?: Array<{
     findingId: string;
     presence: "present" | "absent";
-    value?: unknown;
+    value?: number;
     daysSinceOnset?: number;
   }>;
 }

@@ -19,7 +19,8 @@ import type {
   CostWeights,
   CompletedAction
 } from '../types/health';
-import type { ContentPack, EscalationResult } from '../../engine/types';
+import type { ContentPack } from '../../engine/types';
+import type { EscalationResult } from '../../engine/escalation';
 
 // Import PatientHealthService (will be implemented next)
 import { PatientHealthService } from '../services/PatientHealthService';
@@ -150,6 +151,19 @@ export const useHealthStore = create<HealthStore>()(
       },
 
       addFinding: async (finding: KnownFinding) => {
+        // Validate finding id against content pack
+        try {
+          const engine = await getEngine();
+          const content: ContentPack = engine.getContentPack();
+          const validIds = new Set(content.findings.map(f => f.id));
+          if (!validIds.has(finding.id)) {
+            console.warn(`[healthStore] Rejecting unknown finding id: ${finding.id}`);
+            return; // Silently ignore invalid additions
+          }
+        } catch (err) {
+          console.error('Error validating finding id:', err);
+        }
+
         set((state) => ({
           knownFindings: [...(state.knownFindings || []), finding],
           stateVersion: (state.stateVersion ?? 0) + 1
@@ -230,9 +244,16 @@ export const useHealthStore = create<HealthStore>()(
           const escalationProcessor = createEscalationProcessor(contentPack);
 
           if (outcome.effects && escalationProcessor.shouldProcessEscalation(outcome.effects)) {
+            const findingValues = (knownFindings || []).map(f => ({
+              findingId: f.id,
+              presence: f.presence,
+              value: typeof f.value === 'number' ? f.value : undefined,
+              daysSinceOnset: f.daysSinceOnset
+            }));
+
             const currentCaseState = {
               demographics: undefined,
-              findings: knownFindings || [],
+              findings: findingValues,
               completedActions: (completedActions || []).map(ca => ({
                 actionId: ca.actionId,
                 outcomeId: ca.outcomeId,

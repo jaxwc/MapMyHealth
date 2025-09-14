@@ -48,5 +48,216 @@
       "year": 2019,
       "note": "Sensitivity varies by time since onset of symptoms"
     }
+  },
+  {
+    "id": "cbc_performance",
+    "testId": "cbc_with_diff",
+    "sensitivity": 0.75,
+    "specificity": 0.80,
+    "source": {
+      "source": "CBC Diagnostic Performance",
+      "year": 2020,
+      "note": "Performance for detecting inflammatory conditions"
+    }
+  },
+  {
+    "id": "ct_abdomen_performance",
+    "testId": "ct_abdomen_pelvis",
+    "sensitivity": 0.95,
+    "specificity": 0.92,
+    "piecewiseByCondition": [
+      {
+        "conditionId": "acute_appendicitis",
+        "sensitivity": 0.98,
+        "specificity": 0.95
+      },
+      {
+        "conditionId": "acute_cholecystitis",
+        "sensitivity": 0.92,
+        "specificity": 0.96
+      },
+      {
+        "conditionId": "diverticulitis",
+        "sensitivity": 0.94,
+        "specificity": 0.99
+      },
+      {
+        "conditionId": "acute_pancreatitis",
+        "sensitivity": 0.90,
+        "specificity": 0.85
+      }
+    ],
+    "source": {
+      "source": "CT Abdomen Diagnostic Accuracy Meta-analysis",
+      "year": 2021,
+      "note": "Pooled sensitivity and specificity for acute abdominal conditions"
+    }
+  },
+  {
+    "id": "ultrasound_performance",
+    "testId": "abdominal_ultrasound",
+    "sensitivity": 0.85,
+    "specificity": 0.95,
+    "piecewiseByCondition": [
+      {
+        "conditionId": "acute_cholecystitis",
+        "sensitivity": 0.88,
+        "specificity": 0.80
+      },
+      {
+        "conditionId": "biliary_colic",
+        "sensitivity": 0.96,
+        "specificity": 0.88
+      }
+    ],
+    "source": {
+      "source": "Ultrasound Gallbladder Disease",
+      "year": 2020,
+      "note": "Performance for hepatobiliary conditions"
+    }
+  },
+  {
+    "id": "pancreatic_enzymes_performance",
+    "testId": "lipase_amylase",
+    "sensitivity": 0.90,
+    "specificity": 0.93,
+    "piecewiseByCondition": [
+      {
+        "conditionId": "acute_pancreatitis",
+        "sensitivity": 0.95,
+        "specificity": 0.85
+      }
+    ],
+    "source": {
+      "source": "Pancreatic Enzyme Diagnostic Performance",
+      "year": 2019,
+      "note": "Lipase superior to amylase for pancreatitis diagnosis"
+    }
+  },
+  {
+    "id": "h_pylori_performance",
+    "testId": "h_pylori_testing",
+    "sensitivity": 0.95,
+    "specificity": 0.96,
+    "source": {
+      "source": "H. pylori Testing Meta-analysis",
+      "year": 2020,
+      "note": "Urea breath test performance"
+    }
+  },
+  {
+    "id": "rapid_influenza_performance",
+    "testId": "rapid_influenza_test",
+    "sensitivity": 0.70,
+    "specificity": 0.95,
+    "piecewiseByDaysSinceOnset": [
+      {
+        "daysRange": { "min": 0, "max": 3 },
+        "sensitivity": 0.80,
+        "specificity": 0.95
+      },
+      {
+        "daysRange": { "min": 4, "max": 7 },
+        "sensitivity": 0.60,
+        "specificity": 0.95
+      },
+      {
+        "daysRange": { "min": 8 },
+        "sensitivity": 0.40,
+        "specificity": 0.95
+      }
+    ],
+    "source": {
+      "source": "Rapid Influenza Test Performance",
+      "year": 2021,
+      "note": "Sensitivity decreases with time since onset"
+    }
+  },
+  {
+    "id": "covid_antigen_performance",
+    "testId": "covid_antigen_test",
+    "sensitivity": 0.85,
+    "specificity": 0.99,
+    "piecewiseByViralLoad": [
+      {
+        "viralLoadRange": "high",
+        "sensitivity": 0.95,
+        "specificity": 0.99
+      },
+      {
+        "viralLoadRange": "low",
+        "sensitivity": 0.65,
+        "specificity": 0.99
+      }
+    ],
+    "source": {
+      "source": "COVID-19 Antigen Test Performance",
+      "year": 2022,
+      "note": "Performance varies by viral load and symptom duration"
+    }
+  },
+  {
+    "id": "rheumatoid_markers_performance",
+    "testId": "rheumatoid_factor_test",
+    "sensitivity": 0.75,
+    "specificity": 0.85,
+    "piecewiseByMarker": [
+      {
+        "marker": "rheumatoid_factor",
+        "sensitivity": 0.70,
+        "specificity": 0.80
+      },
+      {
+        "marker": "anti_ccp",
+        "sensitivity": 0.65,
+        "specificity": 0.95
+      }
+    ],
+    "source": {
+      "source": "RA Serological Markers Meta-analysis",
+      "year": 2020,
+      "note": "Anti-CCP more specific, RF more sensitive"
+    }
+  },
+  {
+    "id": "ana_panel_performance",
+    "testId": "ana_panel",
+    "sensitivity": 0.98,
+    "specificity": 0.85,
+    "piecewiseByCondition": [
+      {
+        "conditionId": "systemic_lupus_erythematosus",
+        "sensitivity": 0.99,
+        "specificity": 0.90
+      },
+      {
+        "conditionId": "sjogren_syndrome",
+        "sensitivity": 0.95,
+        "specificity": 0.92
+      }
+    ],
+    "source": {
+      "source": "ANA Testing Autoimmune Disease",
+      "year": 2021,
+      "note": "High sensitivity but variable specificity"
+    }
+  },
+  {
+    "id": "thyroid_function_performance",
+    "testId": "thyroid_function_tests",
+    "sensitivity": 0.99,
+    "specificity": 0.95,
+    "piecewiseByCondition": [
+      {
+        "conditionId": "hashimoto_thyroiditis",
+        "sensitivity": 0.95,
+        "specificity": 0.88
+      }
+    ],
+    "source": {
+      "source": "Thyroid Function Testing Guidelines",
+      "year": 2020,
+      "note": "TSH highly sensitive for thyroid dysfunction"
+    }
   }
 ]

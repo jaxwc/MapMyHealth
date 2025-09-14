@@ -86,6 +86,18 @@ export const Agent = {
   },
 
   /**
+   * Returns the list of valid symptom finding IDs and labels from the content pack.
+   * Use this to constrain agent inputs when adding findings.
+   */
+  listSymptoms: async (): Promise<Array<{ id: string; label: string }>> => {
+    const engine = await createEngineFacade();
+    const content = engine.getContentPack();
+    return content.findings
+      .filter((f: any) => f.kind === 'symptom')
+      .map((f: any) => ({ id: f.id, label: f.label }));
+  },
+
+  /**
    * Returns the top-N conditions by probability.
    * Use this to summarize likely diagnoses or to focus explanation on the most probable.
    * @param limit - maximum number of conditions to return (default 5)

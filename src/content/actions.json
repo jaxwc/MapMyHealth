@@ -372,5 +372,612 @@
         ]
       }
     ]
+  },
+  {
+    "id": "cbc_with_diff",
+    "label": "Complete blood count with differential",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": [],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 45,
+      "timeHours": 2,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "cbc_leukocytosis",
+      "findingIdNegative": "cbc_normal",
+      "performanceRefId": "cbc_performance"
+    },
+    "outcomes": [
+      {
+        "id": "cbc_elevated_wbc",
+        "label": "Elevated white blood cell count",
+        "probabilityHint": 0.25,
+        "effects": [
+          {
+            "findingId": "cbc_leukocytosis",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "cbc_normal_wbc",
+        "label": "Normal white blood cell count",
+        "probabilityHint": 0.75,
+        "effects": [
+          {
+            "findingId": "cbc_normal",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ct_abdomen_pelvis",
+    "label": "CT abdomen and pelvis with contrast",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["abdominal_pain"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 1200,
+      "timeHours": 4,
+      "difficulty": 3,
+      "risk": 1
+    },
+    "testBinding": {
+      "findingIdPositive": "ct_abnormal_findings",
+      "findingIdNegative": "ct_normal",
+      "performanceRefId": "ct_abdomen_performance"
+    },
+    "outcomes": [
+      {
+        "id": "ct_appendicitis",
+        "label": "CT shows appendicitis findings",
+        "probabilityHint": 0.12,
+        "effects": [
+          {
+            "findingId": "ct_abdomen_appendicitis_findings",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "ct_cholecystitis",
+        "label": "CT shows cholecystitis findings",
+        "probabilityHint": 0.08,
+        "effects": [
+          {
+            "findingId": "ct_abdomen_cholecystitis_findings",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "ct_diverticulitis",
+        "label": "CT shows diverticulitis findings",
+        "probabilityHint": 0.06,
+        "effects": [
+          {
+            "findingId": "ct_abdomen_diverticulitis_findings",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "ct_normal",
+        "label": "CT shows no acute pathology",
+        "probabilityHint": 0.74,
+        "effects": [
+          {
+            "findingId": "ct_normal",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "abdominal_ultrasound",
+    "label": "Abdominal ultrasound",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["ruq_pain"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 300,
+      "timeHours": 1,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "ultrasound_abnormal",
+      "findingIdNegative": "ultrasound_normal",
+      "performanceRefId": "ultrasound_performance"
+    },
+    "outcomes": [
+      {
+        "id": "us_gallstones",
+        "label": "Ultrasound shows gallstones",
+        "probabilityHint": 0.35,
+        "effects": [
+          {
+            "findingId": "abdominal_ultrasound_gallstones",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "us_cholecystitis",
+        "label": "Ultrasound shows cholecystitis",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "ultrasound_cholecystitis_wall_thickening",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "us_normal",
+        "label": "Normal ultrasound",
+        "probabilityHint": 0.50,
+        "effects": [
+          {
+            "findingId": "ultrasound_normal",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lipase_amylase",
+    "label": "Serum lipase and amylase",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["epigastric_pain"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 65,
+      "timeHours": 2,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "pancreatic_enzymes_elevated",
+      "findingIdNegative": "pancreatic_enzymes_normal",
+      "performanceRefId": "pancreatic_enzymes_performance"
+    },
+    "outcomes": [
+      {
+        "id": "lipase_elevated",
+        "label": "Elevated lipase",
+        "probabilityHint": 0.08,
+        "effects": [
+          {
+            "findingId": "lipase_elevated",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "amylase_elevated",
+        "label": "Elevated amylase",
+        "probabilityHint": 0.12,
+        "effects": [
+          {
+            "findingId": "amylase_elevated",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "enzymes_normal",
+        "label": "Normal pancreatic enzymes",
+        "probabilityHint": 0.85,
+        "effects": [
+          {
+            "findingId": "pancreatic_enzymes_normal",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "h_pylori_testing",
+    "label": "H. pylori breath test",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["epigastric_pain"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 85,
+      "timeHours": 1,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "h_pylori_breath_positive",
+      "findingIdNegative": "h_pylori_breath_negative",
+      "performanceRefId": "h_pylori_performance"
+    },
+    "outcomes": [
+      {
+        "id": "h_pylori_positive",
+        "label": "H. pylori breath test positive",
+        "probabilityHint": 0.3,
+        "effects": [
+          {
+            "findingId": "h_pylori_breath_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "h_pylori_negative",
+        "label": "H. pylori breath test negative",
+        "probabilityHint": 0.7,
+        "effects": [
+          {
+            "findingId": "h_pylori_breath_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rapid_influenza_test",
+    "label": "Rapid influenza test",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["fever", "myalgias"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 45,
+      "timeHours": 0.5,
+      "difficulty": 1,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "rapid_influenza_positive",
+      "findingIdNegative": "rapid_influenza_negative",
+      "performanceRefId": "rapid_influenza_performance"
+    },
+    "outcomes": [
+      {
+        "id": "flu_positive",
+        "label": "Rapid influenza test positive",
+        "probabilityHint": 0.25,
+        "effects": [
+          {
+            "findingId": "rapid_influenza_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "flu_negative",
+        "label": "Rapid influenza test negative",
+        "probabilityHint": 0.75,
+        "effects": [
+          {
+            "findingId": "rapid_influenza_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "covid_antigen_test",
+    "label": "SARS-CoV-2 antigen test",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": [],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 25,
+      "timeHours": 0.25,
+      "difficulty": 1,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "sars_cov2_antigen_positive",
+      "findingIdNegative": "sars_cov2_antigen_negative",
+      "performanceRefId": "covid_antigen_performance"
+    },
+    "outcomes": [
+      {
+        "id": "covid_positive",
+        "label": "COVID-19 antigen test positive",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "sars_cov2_antigen_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "covid_negative",
+        "label": "COVID-19 antigen test negative",
+        "probabilityHint": 0.85,
+        "effects": [
+          {
+            "findingId": "sars_cov2_antigen_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rheumatoid_factor_test",
+    "label": "Rheumatoid factor and anti-CCP",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["joint_pain", "morning_stiffness_over_60min"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 120,
+      "timeHours": 3,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "autoimmune_markers_positive",
+      "findingIdNegative": "autoimmune_markers_negative",
+      "performanceRefId": "rheumatoid_markers_performance"
+    },
+    "outcomes": [
+      {
+        "id": "rf_anti_ccp_positive",
+        "label": "RF and/or anti-CCP positive",
+        "probabilityHint": 0.2,
+        "effects": [
+          {
+            "findingId": "rf_positive",
+            "presence": "present"
+          },
+          {
+            "findingId": "anti_ccp_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "rf_anti_ccp_negative",
+        "label": "RF and anti-CCP negative",
+        "probabilityHint": 0.8,
+        "effects": [
+          {
+            "findingId": "rf_negative",
+            "presence": "present"
+          },
+          {
+            "findingId": "anti_ccp_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ana_panel",
+    "label": "ANA and autoimmune panel",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["joint_pain"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 180,
+      "timeHours": 4,
+      "difficulty": 3,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "ana_autoimmune_positive",
+      "findingIdNegative": "ana_autoimmune_negative",
+      "performanceRefId": "ana_panel_performance"
+    },
+    "outcomes": [
+      {
+        "id": "ana_positive",
+        "label": "ANA positive",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "ana_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "anti_dsdna_positive",
+        "label": "Anti-dsDNA positive",
+        "probabilityHint": 0.05,
+        "effects": [
+          {
+            "findingId": "anti_dsdna_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "autoimmune_negative",
+        "label": "Negative autoimmune panel",
+        "probabilityHint": 0.80,
+        "effects": [
+          {
+            "findingId": "ana_negative",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "thyroid_function_tests",
+    "label": "Thyroid function tests (TSH, TPO antibodies)",
+    "kind": "Test",
+    "preconditions": {
+      "requireFindings": ["hypothyroid_symptoms"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 95,
+      "timeHours": 3,
+      "difficulty": 2,
+      "risk": 0
+    },
+    "testBinding": {
+      "findingIdPositive": "thyroid_abnormal",
+      "findingIdNegative": "thyroid_normal",
+      "performanceRefId": "thyroid_function_performance"
+    },
+    "outcomes": [
+      {
+        "id": "hypothyroid_autoimmune",
+        "label": "Hypothyroid with positive TPO antibodies",
+        "probabilityHint": 0.12,
+        "effects": [
+          {
+            "findingId": "tsh_high",
+            "presence": "present"
+          },
+          {
+            "findingId": "tpo_antibodies_positive",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "hypothyroid_non_autoimmune",
+        "label": "Hypothyroid without autoimmune markers",
+        "probabilityHint": 0.08,
+        "effects": [
+          {
+            "findingId": "tsh_high",
+            "presence": "present"
+          },
+          {
+            "findingId": "tpo_antibodies_negative",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "thyroid_normal",
+        "label": "Normal thyroid function",
+        "probabilityHint": 0.80,
+        "effects": [
+          {
+            "findingId": "tsh_normal",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wait_observe_24h",
+    "label": "Wait & observe 24 hours",
+    "kind": "WaitObserve",
+    "preconditions": {
+      "requireFindings": [],
+      "forbidFindings": ["rebound_guarding", "stridor", "drooling", "hematemesis", "melena"],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 0,
+      "timeHours": 24,
+      "difficulty": 1,
+      "risk": 1
+    },
+    "waitBinding": {
+      "hours": 24,
+      "outcomes": ["improving", "worse", "no_change"],
+      "findingEffectsByOutcome": {
+        "improving": [
+          {
+            "findingId": "symptom_improvement",
+            "presence": "present"
+          }
+        ],
+        "worse": [
+          {
+            "findingId": "symptom_worsening",
+            "presence": "present"
+          }
+        ],
+        "no_change": [
+          {
+            "findingId": "symptom_stable",
+            "presence": "present"
+          }
+        ]
+      }
+    },
+    "outcomes": [
+      {
+        "id": "improving_24h",
+        "label": "Symptoms improving after 24h",
+        "probabilityHint": 0.65,
+        "effects": [
+          {
+            "findingId": "symptom_improvement",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "worse_24h",
+        "label": "Symptoms worsening after 24h",
+        "probabilityHint": 0.20,
+        "effects": [
+          {
+            "findingId": "symptom_worsening",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "no_change_24h",
+        "label": "No change in symptoms after 24h",
+        "probabilityHint": 0.15,
+        "effects": [
+          {
+            "findingId": "symptom_stable",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
   }
 ]

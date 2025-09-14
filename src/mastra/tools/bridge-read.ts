@@ -102,6 +102,19 @@ export const readConditionInformation = createTool({
   },
 });
 
+export const readSymptoms = createTool({
+  id: 'readSymptoms',
+  description: 'Returns the valid symptom finding IDs and labels from the content pack.',
+  inputSchema: z.object({}).optional(),
+  outputSchema: z.object({
+    items: z.array(z.object({ id: z.string(), label: z.string() }))
+  }),
+  execute: async () => {
+    const items = await AgentBridge.listSymptoms();
+    return { items };
+  },
+});
+
 export const bridgeReadTools = {
   readHealthState,
   readKnownFindings,
@@ -109,6 +122,7 @@ export const bridgeReadTools = {
   readActionRanking,
   readActionMap,
   readConditionInformation,
+  readSymptoms,
   renderActionMap,
 };
 

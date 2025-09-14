@@ -4,49 +4,56 @@
     "label": "Sore throat",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["ENT", "respiratory"]
   },
   {
     "id": "fever",
     "label": "Fever",
     "kind": "symptom",
     "units": "°F",
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["systemic", "infectious"]
   },
   {
     "id": "cough",
     "label": "Cough",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["respiratory", "pulmonary"]
   },
   {
     "id": "tonsillar_exudates",
     "label": "Tonsillar exudates",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["ENT", "infectious"]
   },
   {
     "id": "tender_cervical_nodes",
     "label": "Tender anterior cervical nodes",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["ENT", "lymphatic", "infectious"]
   },
   {
     "id": "runny_nose",
     "label": "Runny nose",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["ENT", "respiratory", "allergic"]
   },
   {
     "id": "fatigue",
     "label": "Marked fatigue",
     "kind": "symptom",
     "units": null,
-    "isRedFlag": false
+    "isRedFlag": false,
+    "categories": ["systemic", "infectious", "autoimmune", "endocrine"]
   },
   {
     "id": "sore_throat_duration",
@@ -200,5 +207,1079 @@
     "kind": "outcome",
     "units": null,
     "isRedFlag": false
+  },
+  {
+    "id": "diarrhea",
+    "label": "Diarrhea",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "infectious"]
+  },
+  {
+    "id": "bloody_diarrhea",
+    "label": "Bloody diarrhea",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "chronic_diarrhea",
+    "label": "Chronic diarrhea (>4 weeks)",
+    "kind": "symptom",
+    "units": "weeks",
+    "isRedFlag": false
+  },
+  {
+    "id": "vomiting",
+    "label": "Vomiting",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "systemic"]
+  },
+  {
+    "id": "nausea",
+    "label": "Nausea",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "systemic"]
+  },
+  {
+    "id": "epigastric_pain",
+    "label": "Epigastric pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "gastric", "pancreatic"]
+  },
+  {
+    "id": "rlq_pain",
+    "label": "Right lower quadrant pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "abdominal"]
+  },
+  {
+    "id": "ruq_pain",
+    "label": "Right upper quadrant pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["GI", "hepatobiliary"]
+  },
+  {
+    "id": "llq_pain",
+    "label": "Left lower quadrant pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "periumbilical_pain_migrates_rlq",
+    "label": "Periumbilical pain migrating to RLQ",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "postprandial_ruq_pain",
+    "label": "Postprandial RUQ pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "heartburn",
+    "label": "Heartburn",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "regurgitation",
+    "label": "Acid regurgitation",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "nocturnal_symptoms",
+    "label": "Nocturnal symptoms",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "melena",
+    "label": "Melena (black tarry stools)",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "hematemesis",
+    "label": "Hematemesis (vomiting blood)",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "weight_loss_unintentional",
+    "label": "Unintentional weight loss",
+    "kind": "symptom",
+    "units": "lbs",
+    "isRedFlag": false
+  },
+  {
+    "id": "constipation",
+    "label": "Constipation",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "bloating",
+    "label": "Abdominal bloating",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "early_satiety",
+    "label": "Early satiety",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "jaundice",
+    "label": "Jaundice",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "dark_urine",
+    "label": "Dark urine",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "pale_stools",
+    "label": "Pale stools",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "tenesmus",
+    "label": "Tenesmus",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "urgency",
+    "label": "Bowel urgency",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "alternating_bowel_habits",
+    "label": "Alternating bowel habits",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "abdominal_pain_relieved_defecation",
+    "label": "Abdominal pain relieved by defecation",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "perianal_disease",
+    "label": "Perianal disease",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "erythema_nodosum",
+    "label": "Erythema nodosum",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "iron_deficiency_anemia",
+    "label": "Iron deficiency anemia",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "alarm_symptoms_absent",
+    "label": "Absence of alarm symptoms",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "mcburney_point_tenderness",
+    "label": "McBurney's point tenderness",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "rebound_guarding",
+    "label": "Rebound tenderness/guarding",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "murphy_sign_positive",
+    "label": "Murphy's sign positive",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "nasal_congestion",
+    "label": "Nasal congestion",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "facial_pain_pressure",
+    "label": "Facial pain/pressure",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "purulent_nasal_discharge",
+    "label": "Purulent nasal discharge",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "clear_rhinorrhea",
+    "label": "Clear nasal discharge",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "sneezing_fits",
+    "label": "Paroxysmal sneezing",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "seasonal_pattern",
+    "label": "Seasonal symptom pattern",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "hoarseness_voice_change",
+    "label": "Hoarseness/voice change",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "voice_loss",
+    "label": "Complete voice loss",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "dry_cough",
+    "label": "Dry cough",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "throat_clearing",
+    "label": "Frequent throat clearing",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "myalgias",
+    "label": "Myalgias (muscle aches)",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "sudden_onset",
+    "label": "Sudden onset of symptoms",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "anosmia_ageusia",
+    "label": "Loss of smell/taste",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "trismus",
+    "label": "Trismus (limited jaw opening)",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "uvular_deviation",
+    "label": "Uvular deviation",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "hot_potato_voice",
+    "label": "Muffled 'hot potato' voice",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "severe_sore_throat_unilateral",
+    "label": "Severe unilateral sore throat",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "tripod_position",
+    "label": "Tripod positioning",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "muffled_voice",
+    "label": "Muffled voice",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "maxillary_tenderness",
+    "label": "Maxillary sinus tenderness",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "symptoms_duration_over_10_days",
+    "label": "Symptoms >10 days duration",
+    "kind": "history",
+    "units": "days",
+    "isRedFlag": false
+  },
+  {
+    "id": "morning_stiffness_over_60min",
+    "label": "Morning stiffness >60 minutes",
+    "kind": "symptom",
+    "units": "minutes",
+    "isRedFlag": false,
+    "categories": ["rheumatologic", "autoimmune"]
+  },
+  {
+    "id": "symmetric_small_joint_pain",
+    "label": "Symmetric small joint pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "joint_swelling",
+    "label": "Joint swelling",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "photosensitive_rash",
+    "label": "Photosensitive rash",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "oral_nasal_ulcers",
+    "label": "Oral/nasal ulcers",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "raynaud_phenomenon",
+    "label": "Raynaud's phenomenon",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "arthritis_non_erosive",
+    "label": "Non-erosive arthritis",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "back_pain_inflammatory",
+    "label": "Inflammatory back pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "sacroiliac_joint_pain",
+    "label": "Sacroiliac joint pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "morning_stiffness_back",
+    "label": "Morning back stiffness",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "psoriasis_skin_lesions",
+    "label": "Psoriatic skin lesions",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "dactylitis",
+    "label": "Dactylitis (sausage digits)",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "asymmetric_joint_involvement",
+    "label": "Asymmetric joint involvement",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "nail_pitting",
+    "label": "Nail pitting",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "dry_eyes_dry_mouth",
+    "label": "Dry eyes and dry mouth",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "parotid_gland_enlargement",
+    "label": "Parotid gland enlargement",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "goiter",
+    "label": "Goiter",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "hypothyroid_symptoms",
+    "label": "Hypothyroid symptoms",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "nsaid_use",
+    "label": "NSAID use",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "response_to_ppi",
+    "label": "Response to PPI therapy",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "h_pylori_breath_positive",
+    "label": "H. pylori breath test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["h_pylori_breath_negative"]
+  },
+  {
+    "id": "h_pylori_breath_negative",
+    "label": "H. pylori breath test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["h_pylori_breath_positive"]
+  },
+  {
+    "id": "stool_h_pylori_antigen_positive",
+    "label": "Stool H. pylori antigen positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["stool_h_pylori_antigen_negative"]
+  },
+  {
+    "id": "stool_h_pylori_antigen_negative",
+    "label": "Stool H. pylori antigen negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["stool_h_pylori_antigen_positive"]
+  },
+  {
+    "id": "fecal_occult_blood_positive",
+    "label": "Fecal occult blood positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["fecal_occult_blood_negative"]
+  },
+  {
+    "id": "fecal_occult_blood_negative",
+    "label": "Fecal occult blood negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["fecal_occult_blood_positive"]
+  },
+  {
+    "id": "fecal_calprotectin_elevated",
+    "label": "Elevated fecal calprotectin",
+    "kind": "testFinding",
+    "units": "μg/g",
+    "isRedFlag": false
+  },
+  {
+    "id": "cbc_leukocytosis",
+    "label": "CBC showing leukocytosis",
+    "kind": "testFinding",
+    "units": "cells/μL",
+    "isRedFlag": false
+  },
+  {
+    "id": "crp_elevated",
+    "label": "Elevated CRP",
+    "kind": "testFinding",
+    "units": "mg/L",
+    "isRedFlag": false
+  },
+  {
+    "id": "esr_elevated",
+    "label": "Elevated ESR",
+    "kind": "testFinding",
+    "units": "mm/hr",
+    "isRedFlag": false
+  },
+  {
+    "id": "lfts_elevated",
+    "label": "Elevated liver function tests",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "bilirubin_elevated",
+    "label": "Elevated bilirubin",
+    "kind": "testFinding",
+    "units": "mg/dL",
+    "isRedFlag": false
+  },
+  {
+    "id": "lipase_elevated",
+    "label": "Elevated lipase",
+    "kind": "testFinding",
+    "units": "U/L",
+    "isRedFlag": false
+  },
+  {
+    "id": "amylase_elevated",
+    "label": "Elevated amylase",
+    "kind": "testFinding",
+    "units": "U/L",
+    "isRedFlag": false
+  },
+  {
+    "id": "abdominal_ultrasound_gallstones",
+    "label": "Abdominal ultrasound showing gallstones",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "ultrasound_cholecystitis_wall_thickening",
+    "label": "Ultrasound showing cholecystitis/wall thickening",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "ct_abdomen_appendicitis_findings",
+    "label": "CT abdomen showing appendicitis findings",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "ct_abdomen_diverticulitis_findings",
+    "label": "CT abdomen showing diverticulitis findings",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "pregnancy_test_positive",
+    "label": "Pregnancy test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["pregnancy_test_negative"]
+  },
+  {
+    "id": "pregnancy_test_negative",
+    "label": "Pregnancy test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["pregnancy_test_positive"]
+  },
+  {
+    "id": "rapid_influenza_positive",
+    "label": "Rapid influenza test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["rapid_influenza_negative"]
+  },
+  {
+    "id": "rapid_influenza_negative",
+    "label": "Rapid influenza test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["rapid_influenza_positive"]
+  },
+  {
+    "id": "sars_cov2_antigen_positive",
+    "label": "SARS-CoV-2 antigen test positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["sars_cov2_antigen_negative"]
+  },
+  {
+    "id": "sars_cov2_antigen_negative",
+    "label": "SARS-CoV-2 antigen test negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["sars_cov2_antigen_positive"]
+  },
+  {
+    "id": "rf_positive",
+    "label": "Rheumatoid factor positive",
+    "kind": "testFinding",
+    "units": "IU/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["rf_negative"]
+  },
+  {
+    "id": "rf_negative",
+    "label": "Rheumatoid factor negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["rf_positive"]
+  },
+  {
+    "id": "anti_ccp_positive",
+    "label": "Anti-CCP antibodies positive",
+    "kind": "testFinding",
+    "units": "U/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["anti_ccp_negative"]
+  },
+  {
+    "id": "anti_ccp_negative",
+    "label": "Anti-CCP antibodies negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["anti_ccp_positive"]
+  },
+  {
+    "id": "ana_positive",
+    "label": "ANA positive",
+    "kind": "testFinding",
+    "units": "titer",
+    "isRedFlag": false,
+    "contradictsWith": ["ana_negative"]
+  },
+  {
+    "id": "ana_negative",
+    "label": "ANA negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ana_positive"]
+  },
+  {
+    "id": "anti_dsdna_positive",
+    "label": "Anti-dsDNA positive",
+    "kind": "testFinding",
+    "units": "IU/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["anti_dsdna_negative"]
+  },
+  {
+    "id": "anti_dsdna_negative",
+    "label": "Anti-dsDNA negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["anti_dsdna_positive"]
+  },
+  {
+    "id": "complement_low",
+    "label": "Low complement (C3/C4)",
+    "kind": "testFinding",
+    "units": "mg/dL",
+    "isRedFlag": false
+  },
+  {
+    "id": "hla_b27_positive",
+    "label": "HLA-B27 positive",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["hla_b27_negative"]
+  },
+  {
+    "id": "hla_b27_negative",
+    "label": "HLA-B27 negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["hla_b27_positive"]
+  },
+  {
+    "id": "positive_schirmer_test",
+    "label": "Positive Schirmer test",
+    "kind": "testFinding",
+    "units": "mm",
+    "isRedFlag": false
+  },
+  {
+    "id": "anti_ro_ssa_positive",
+    "label": "Anti-Ro/SSA positive",
+    "kind": "testFinding",
+    "units": "U/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["anti_ro_ssa_negative"]
+  },
+  {
+    "id": "anti_ro_ssa_negative",
+    "label": "Anti-Ro/SSA negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["anti_ro_ssa_positive"]
+  },
+  {
+    "id": "tsh_high",
+    "label": "Elevated TSH",
+    "kind": "testFinding",
+    "units": "mIU/L",
+    "isRedFlag": false,
+    "contradictsWith": ["tsh_low", "tsh_normal"]
+  },
+  {
+    "id": "tsh_low",
+    "label": "Low TSH",
+    "kind": "testFinding",
+    "units": "mIU/L",
+    "isRedFlag": false,
+    "contradictsWith": ["tsh_high", "tsh_normal"]
+  },
+  {
+    "id": "tsh_normal",
+    "label": "Normal TSH",
+    "kind": "testFinding",
+    "units": "mIU/L",
+    "isRedFlag": false,
+    "contradictsWith": ["tsh_high", "tsh_low"]
+  },
+  {
+    "id": "tpo_antibodies_positive",
+    "label": "TPO antibodies positive",
+    "kind": "testFinding",
+    "units": "IU/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["tpo_antibodies_negative"]
+  },
+  {
+    "id": "tpo_antibodies_negative",
+    "label": "TPO antibodies negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["tpo_antibodies_positive"]
+  },
+  {
+    "id": "ttg_iga_positive",
+    "label": "TTG-IgA positive",
+    "kind": "testFinding",
+    "units": "U/mL",
+    "isRedFlag": false,
+    "contradictsWith": ["ttg_iga_negative"]
+  },
+  {
+    "id": "ttg_iga_negative",
+    "label": "TTG-IgA negative",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ttg_iga_positive"]
+  },
+  {
+    "id": "iga_total_normal",
+    "label": "Total IgA normal",
+    "kind": "testFinding",
+    "units": "mg/dL",
+    "isRedFlag": false
+  },
+  {
+    "id": "airway_compromise",
+    "label": "Signs of airway compromise",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "severe_dehydration",
+    "label": "Severe dehydration",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "gi_bleeding_signs",
+    "label": "Signs of GI bleeding",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "peritonitis_signs",
+    "label": "Signs of peritonitis",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "persistent_high_fever",
+    "label": "Persistent high fever >101.5°F",
+    "kind": "symptom",
+    "units": "°F",
+    "isRedFlag": true
+  },
+  {
+    "id": "hypotension_syncope",
+    "label": "Hypotension/syncope",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "pregnancy_with_abdominal_pain",
+    "label": "Pregnancy with abdominal pain",
+    "kind": "history",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "jaundice_with_fever",
+    "label": "Jaundice with fever",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "altered_mental_status",
+    "label": "Altered mental status",
+    "kind": "examSign",
+    "units": null,
+    "isRedFlag": true
+  },
+  {
+    "id": "abdominal_pain",
+    "label": "Abdominal pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "joint_pain",
+    "label": "Joint pain",
+    "kind": "symptom",
+    "units": null,
+    "isRedFlag": false,
+    "categories": ["rheumatologic", "autoimmune", "musculoskeletal"]
+  },
+  {
+    "id": "cbc_normal",
+    "label": "Normal CBC",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["cbc_leukocytosis"]
+  },
+  {
+    "id": "ct_abnormal_findings",
+    "label": "CT showing abnormal findings",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ct_normal"]
+  },
+  {
+    "id": "ct_normal",
+    "label": "Normal CT scan",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ct_abnormal_findings"]
+  },
+  {
+    "id": "ct_abdomen_cholecystitis_findings",
+    "label": "CT abdomen showing cholecystitis findings",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "ultrasound_abnormal",
+    "label": "Abnormal ultrasound findings",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ultrasound_normal"]
+  },
+  {
+    "id": "ultrasound_normal",
+    "label": "Normal ultrasound",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ultrasound_abnormal"]
+  },
+  {
+    "id": "pancreatic_enzymes_elevated",
+    "label": "Elevated pancreatic enzymes",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["pancreatic_enzymes_normal"]
+  },
+  {
+    "id": "pancreatic_enzymes_normal",
+    "label": "Normal pancreatic enzymes",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["pancreatic_enzymes_elevated"]
+  },
+  {
+    "id": "autoimmune_markers_positive",
+    "label": "Positive autoimmune markers",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["autoimmune_markers_negative"]
+  },
+  {
+    "id": "autoimmune_markers_negative",
+    "label": "Negative autoimmune markers",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["autoimmune_markers_positive"]
+  },
+  {
+    "id": "ana_autoimmune_positive",
+    "label": "Positive ANA/autoimmune panel",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ana_autoimmune_negative"]
+  },
+  {
+    "id": "ana_autoimmune_negative",
+    "label": "Negative ANA/autoimmune panel",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["ana_autoimmune_positive"]
+  },
+  {
+    "id": "thyroid_abnormal",
+    "label": "Abnormal thyroid function",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["thyroid_normal"]
+  },
+  {
+    "id": "thyroid_normal",
+    "label": "Normal thyroid function",
+    "kind": "testFinding",
+    "units": null,
+    "isRedFlag": false,
+    "contradictsWith": ["thyroid_abnormal"]
   }
 ]

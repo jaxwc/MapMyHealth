@@ -30,6 +30,7 @@ import { seedPriors, applyEvidence, classify } from './beliefs';
 import { mostInformativeUnknowns, scoreActionVOI } from './influence';
 import { rankActions, planBranches } from './planner';
 import { compileState, compileActionOutcomesForState, getConditionRankings, generateWhyExplanation } from './compiler';
+import { filterActiveConditions } from './activation';
 
 /**
  * Build the complete view model for the UI
@@ -52,15 +53,18 @@ export function buildView(input: EngineInput): ViewModelOutput {
     return buildUrgentView(triage, caseState, contentPack);
   }
   
-  // Step 2: Compute beliefs
-  const priors = seedPriors(caseState, contentPack.conditions);
-  const beliefs = applyEvidence(priors, caseState, contentPack.conditions, contentPack.testPerformance);
+  // Step 2: Filter conditions based on activation rules
+  const activeConditions = filterActiveConditions(caseState, contentPack.conditions, contentPack.findings);
+
+  // Step 3: Compute beliefs with active conditions
+  const priors = seedPriors(caseState, activeConditions);
+  const beliefs = applyEvidence(priors, caseState, activeConditions, contentPack.testPerformance);
   
-  // Step 3: Classify beliefs
-  const classification = classify(beliefs, contentPack.conditions);
+  // Step 4: Classify beliefs
+  const classification = classify(beliefs, activeConditions);
   
   // Step 4: Build top panel data
-  const topPanel = buildTopPanel(caseState, beliefs, contentPack, classification);
+  const topPanel = buildTopPanel(caseState, beliefs, contentPack, classification, activeConditions);
   
   // Step 5: Build bottom panel data
   const bottomPanel = buildBottomPanel(
@@ -68,7 +72,8 @@ export function buildView(input: EngineInput): ViewModelOutput {
     beliefs, 
     contentPack, 
     userCostWeights,
-    classification
+    classification,
+    activeConditions
   );
   
   return {
@@ -135,7 +140,8 @@ function buildTopPanel(
   caseState: CaseState,
   beliefs: any,
   contentPack: any,
-  classification: any
+  classification: any,
+  activeConditions: ConditionDef[]
 ): TopPanelData {
   // Get known findings
   const knownFindings = {
@@ -144,12 +150,12 @@ function buildTopPanel(
   };
   
   // Get ranked conditions
-  const rankedConditions = getConditionRankings(beliefs, contentPack.conditions, 5);
+  const rankedConditions = getConditionRankings(beliefs, activeConditions, 5);
   
   // Get most informative unknowns
   const informativeUnknowns = mostInformativeUnknowns(
     beliefs,
-    contentPack.conditions,
+    activeConditions,
     contentPack.findings,
     5,
     caseState
@@ -163,7 +169,7 @@ function buildTopPanel(
   // Generate why explanations for top conditions
   const why: WhyExplanation[] = [];
   for (const condition of rankedConditions.slice(0, 3)) {
-    const explanation = generateWhyExplanation(condition.id, beliefs, contentPack.conditions);
+    const explanation = generateWhyExplanation(condition.id, beliefs, activeConditions);
     why.push({
       conditionId: condition.id,
       supporting: explanation.supporting,
@@ -195,14 +201,15 @@ function buildBottomPanel(
   beliefs: any,
   contentPack: any,
   userCostWeights: any,
-  classification: any
+  classification: any,
+  activeConditions: ConditionDef[]
 ): BottomPanelData {
   // Rank actions
   const rankedActions = rankActions(
     caseState,
     beliefs,
     contentPack.actions,
-    contentPack.conditions,
+    activeConditions,
     contentPack.testPerformance,
     userCostWeights,
     3
@@ -228,7 +235,7 @@ function buildBottomPanel(
     beliefs,
     rankedActions,
     contentPack.actions,
-    contentPack.conditions,
+    activeConditions,
     contentPack.testPerformance
   );
   
@@ -237,7 +244,7 @@ function buildBottomPanel(
     caseState,
     beliefs,
     contentPack.actions,
-    contentPack.conditions,
+    activeConditions,
     contentPack.testPerformance,
     userCostWeights,
     2, // depth

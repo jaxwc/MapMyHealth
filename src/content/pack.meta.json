@@ -1,10 +1,17 @@
 {
-  "name": "Acute Sore Throat - Adult",
-  "version": "1.0.0",
+  "name": "Primary Care Diagnostic Package",
+  "version": "2.0.0",
   "jurisdiction": "US",
+  "description": "Comprehensive diagnostic decision support covering common presentations in primary care, urgent care, and emergency medicine",
+  "categories": [
+    "ENT/Respiratory Conditions",
+    "GI/Abdominal Pain",
+    "Autoimmune/Rheumatology/Endocrine"
+  ],
+  "conditionCount": 28,
   "source": {
-    "source": "Clinical Guidelines and Literature Review",
-    "year": 2023,
-    "note": "Educational prototype based on clinical guidelines for adult sore throat evaluation"
+    "source": "Clinical Guidelines and Medical Literature Meta-analysis",
+    "year": 2024,
+    "note": "Evidence-based diagnostic package with likelihood ratios from recent medical literature (2016-2022). Covers 28 conditions across primary care domains with age-stratified priors and comprehensive clinical findings."
   }
 }

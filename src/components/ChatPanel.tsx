@@ -42,11 +42,13 @@ const TypingIndicator = () => (
 
 export default function ChatPanel({}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { sender: "ai", text: "Hello! I am your health assistant. How can I help you today?" },
+    { sender: "ai", text: "Hello! I am your health assistant. How can I help you today? Start by describing your symptoms." },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const genThreadId = () => `thread-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const [threadId, setThreadId] = useState<string>(() => genThreadId());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamMsgIndexRef = useRef<number | null>(null);
   const rehydrateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -73,7 +75,7 @@ export default function ChatPanel({}: ChatPanelProps) {
       const response = await fetch("/api/agent/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: currentInput }),
+        body: JSON.stringify({ prompt: currentInput, threadId }),
       });
 
       if (!response.ok || !response.body) {
@@ -100,9 +102,37 @@ export default function ChatPanel({}: ChatPanelProps) {
         });
       };
 
+      // Helper to finalize the current streaming message into a static bubble
+      const finalizeStreaming = () => {
+        if (streamMsgIndexRef.current != null) {
+          const segments = extractSegments(aggregated);
+          const jsx = (
+            <div className="space-y-3">
+              {segments.map((seg, i) => (
+                <div key={i}>
+                  {seg.type === 'markdown' ? renderMarkdown(seg.value) : renderUI(seg.value)}
+                </div>
+              ))}
+            </div>
+          );
+          setMessages((prev) => {
+            const updated = [...prev];
+            const idx = streamMsgIndexRef.current as number;
+            if (updated[idx]) {
+              updated[idx] = { sender: 'ai', text: '', jsx } as any;
+            }
+            return updated;
+          });
+          streamMsgIndexRef.current = null;
+          aggregated = '';
+        }
+      };
+
       // Show breadcrumbs only for tool-call, not for tool-result
       const pushBreadcrumb = (phase: string, toolName?: string) => {
         if (phase !== 'tool-call') return;
+        // Break current streaming bubble before showing a tool-call
+        finalizeStreaming();
         const toFriendly = (name?: string) => {
           switch (name) {
             case 'addFinding':
@@ -295,29 +325,11 @@ export default function ChatPanel({}: ChatPanelProps) {
               const toolName = evt.data?.toolName;
               pushBreadcrumb(phase, toolName);
             } else if (evt.type === 'done') {
-              // Replace the streaming message with one combined bubble containing markdown and inline UI
-              const segments = extractSegments(evt.data || aggregated);
-              const jsx = (
-                <div className="space-y-3">
-                  {segments.map((seg, i) => (
-                    <div key={i}>
-                      {seg.type === 'markdown' ? renderMarkdown(seg.value) : renderUI(seg.value)}
-                    </div>
-                  ))}
-                </div>
-              );
-              setMessages((prev) => {
-                const updated = [...prev];
-                const idx = streamMsgIndexRef.current;
-                if (idx != null && updated[idx]) {
-                  updated[idx] = { sender: 'ai', text: '', jsx } as any;
-                } else {
-                  updated.push({ sender: 'ai', text: '', jsx } as any);
-                }
-                streamMsgIndexRef.current = null;
-                return updated;
-              });
+              // Finalize any in-progress streaming bubble at end of stream
+              finalizeStreaming();
             } else if (evt.type === 'ui') {
+              // Ensure UI blocks are separate from streaming bubbles
+              finalizeStreaming();
               // Inline UI updates outside of final message: show as its own bubble
               let jsxNode: React.ReactNode = renderUI(evt.data);
               if (evt.data?.ui === 'action-map') {
@@ -330,6 +342,8 @@ export default function ChatPanel({}: ChatPanelProps) {
             } else if (evt.type === 'tool') {
               // no-op; avoid noisy local echoes
             } else if (evt.type === 'tool-result') {
+              // Break current streaming bubble before reconciling and showing tool result UI
+              finalizeStreaming();
               // Reconcile store locally so UI reflects changes immediately
               reconcileToolResult();
               // Show contextual UI bubble for added symptoms
@@ -399,7 +413,8 @@ export default function ChatPanel({}: ChatPanelProps) {
               });
               const snapshot = await res.json();
               replaceAll(snapshot);
-              setMessages([{ sender: 'ai', text: 'New conversation started. How can I help you today?' }]);
+              setMessages([{ sender: 'ai', text: '[New] Hello, I am your health assistant. How can I help you today? Start by describing your symptoms.' }]);
+              setThreadId(genThreadId());
             } catch (e) {
               console.error('New conversation reset failed', e);
             }

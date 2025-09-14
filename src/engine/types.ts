@@ -27,12 +27,18 @@ export interface FindingDef {
   units?: string;
   isRedFlag?: boolean;
   contradictsWith?: ID[]; // Array of finding IDs that contradict this finding
+  categories?: string[]; // Categories for context-based activation
 }
 
 export interface ConditionDef {
   id: ID;
   label: string;
   description: string;
+  contexts?: string[];
+  activationRules?: {
+    requireAny?: ID[];
+    requireAll?: ID[];
+  };
   priors: {
     default: number;
     byDemo?: Array<{
