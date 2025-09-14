@@ -117,5 +117,82 @@
     "kind": "symptom",
     "units": null,
     "isRedFlag": true
+  },
+  {
+    "id": "symptom_improvement",
+    "label": "Symptom improvement after observation",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "symptom_worsening",
+    "label": "Symptom worsening after observation",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "symptom_stable",
+    "label": "Symptoms remain stable after observation",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "provider_notified",
+    "label": "Healthcare provider notified",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "urgent_appointment_scheduled",
+    "label": "Urgent appointment scheduled",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "er_referral_given",
+    "label": "Emergency room referral given",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "er_visit_planned",
+    "label": "Emergency room visit planned",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "continued_home_monitoring",
+    "label": "Continued home monitoring",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "additional_symptoms_found",
+    "label": "Additional symptoms identified",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "symptom_progression_documented",
+    "label": "Symptom progression documented",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
+  },
+  {
+    "id": "emergency_care_completed",
+    "label": "Emergency medical care completed",
+    "kind": "outcome",
+    "units": null,
+    "isRedFlag": false
   }
 ]

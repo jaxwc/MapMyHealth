@@ -8,6 +8,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { createEngineFacade } from '../../engine/facade';
+import { createEscalationProcessor } from '../../engine/escalation';
 import type {
   HealthState,
   HealthCommands,
@@ -18,6 +19,7 @@ import type {
   CostWeights,
   CompletedAction
 } from '../types/health';
+import type { ContentPack, EscalationResult } from '../../engine/types';
 
 // Import PatientHealthService (will be implemented next)
 import { PatientHealthService } from '../services/PatientHealthService';
@@ -45,11 +47,14 @@ export const useHealthStore = create<HealthStore>()(
       return enginePromise;
     };
 
-    // Clear treatment recommendations when state changes
+    // Clear treatment recommendations and escalation results when state changes
     const clearTreatmentsOnChange = () => {
-      const { treatmentRecommendation } = get();
-      if (treatmentRecommendation) {
-        set({ treatmentRecommendation: undefined });
+      const { treatmentRecommendation, escalationResult } = get();
+      if (treatmentRecommendation || escalationResult) {
+        set({
+          treatmentRecommendation: undefined,
+          escalationResult: undefined
+        });
       }
     };
 
@@ -72,6 +77,7 @@ export const useHealthStore = create<HealthStore>()(
           actionRanking: outputs.actionRanking,
           triage: outputs.triage,
           engineRecommendation: outputs.engineRecommendation,
+          escalationResult: undefined, // Clear escalation on recompute
           lastEvaluatedAt: new Date().toISOString()
         });
       } catch (error) {
@@ -97,6 +103,7 @@ export const useHealthStore = create<HealthStore>()(
       lastEvaluatedAt: undefined,
       triage: undefined,
       engineRecommendation: undefined,
+      escalationResult: undefined,
       costWeights: DEFAULT_COST_WEIGHTS,
       completedActions: []
     };
@@ -176,13 +183,44 @@ export const useHealthStore = create<HealthStore>()(
       },
 
       applyActionOutcome: async (actionId: string, outcomeId: string) => {
-        const { actionMap } = get();
+        const { actionMap, knownFindings, triage, completedActions } = get();
         const entry = actionMap.catalog[actionId];
         const outcome = entry?.outcomes.find(o => o.outcomeId === outcomeId);
 
         if (!outcome) {
           console.error(`Outcome ${outcomeId} not found for action ${actionId}`);
           return;
+        }
+
+        let escalationResult: EscalationResult | undefined;
+
+        // Process escalation if engine is available
+        try {
+          const engine = await getEngine();
+          const contentPack = engine.getContentPack();
+          const escalationProcessor = createEscalationProcessor(contentPack);
+
+          if (outcome.effects && escalationProcessor.shouldProcessEscalation(outcome.effects)) {
+            const currentCaseState = {
+              demographics: undefined,
+              findings: knownFindings || [],
+              completedActions: (completedActions || []).map(ca => ({
+                actionId: ca.actionId,
+                outcomeId: ca.outcomeId,
+                at: new Date(ca.at)
+              }))
+            };
+
+            escalationResult = escalationProcessor.processOutcomeEscalation(
+              actionId,
+              outcomeId,
+              outcome.effects,
+              triage || { urgent: false },
+              currentCaseState
+            );
+          }
+        } catch (error) {
+          console.error('Error processing escalation:', error);
         }
 
         set((state) => {
@@ -218,7 +256,9 @@ export const useHealthStore = create<HealthStore>()(
           return {
             knownFindings: updatedFindings,
             completedActions: [...(state.completedActions || []), newCompletedAction],
-            treatmentRecommendation: undefined // Clear on state change
+            treatmentRecommendation: undefined, // Clear on state change
+            escalationResult, // Store escalation result
+            triage: escalationResult?.newTriage || state.triage // Update triage if escalated
           };
         });
 

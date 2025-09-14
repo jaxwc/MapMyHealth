@@ -66,6 +66,9 @@ export interface HealthState {
   triage?: { urgent: boolean; flags?: string[] };
   engineRecommendation?: string;
 
+  // Escalation state
+  escalationResult?: import('../../engine/types').EscalationResult;
+
   // User preferences
   costWeights?: CostWeights;
 

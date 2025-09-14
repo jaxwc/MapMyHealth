@@ -219,7 +219,7 @@ export function getConditionRankings(
   beliefs: Beliefs, 
   conditionDefs: ConditionDef[], 
   maxCount: number = 5
-): Array<{ id: string; label: string; probability: number; statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" }> {
+): Array<{ id: string; label: string; probability: number; statusLabel: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely" }> {
   const classification = classify(beliefs, conditionDefs);
 
   return classification.top.slice(0, maxCount).map(([conditionId, probability]) => {
@@ -227,7 +227,7 @@ export function getConditionRankings(
     const label = condition?.label || conditionId;
 
     // Determine status by matching probability band
-    let statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" = "unknown";
+    let statusLabel: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely" = "possible";
     if (condition) {
       const matchingBand = condition.probabilityBands.find(b => probability >= b.minInclusive && probability < b.maxExclusive);
       if (matchingBand) statusLabel = matchingBand.category;

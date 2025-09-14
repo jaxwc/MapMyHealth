@@ -153,7 +153,7 @@ export function classify(beliefs: Beliefs, conditionDefs: ConditionDef[]): Class
   if (sortedConditions.length === 0) {
     return {
       top: [],
-      label: "unknown" as "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
+      label: "possible" as "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely",
       recommendation: "watchful-waiting"
     };
   }
@@ -164,13 +164,13 @@ export function classify(beliefs: Beliefs, conditionDefs: ConditionDef[]): Class
   if (!topCondition) {
     return {
       top: sortedConditions.slice(0, 3),
-      label: "unknown" as "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
+      label: "possible" as "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely",
       recommendation: "watchful-waiting"
     };
   }
   
   // Determine classification based on probability bands
-  let label: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely" = "unknown";
+  let label: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely" = "possible";
   let recommendation: Recommendation = "watchful-waiting";
 
   const matchingBand = topCondition.probabilityBands.find(b => topProbability >= b.minInclusive && topProbability < b.maxExclusive);

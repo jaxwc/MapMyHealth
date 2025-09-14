@@ -63,7 +63,7 @@ describe('ViewModel Module - End-to-End Tests', () => {
       for (const condition of vm.topPanel.rankedConditions) {
         expect(condition.probability).toBeGreaterThanOrEqual(0);
         expect(condition.probability).toBeLessThanOrEqual(1);
-        expect(['highly-likely', 'likely', 'unknown', 'not-likely', 'very-unlikely']).toContain(condition.statusLabel);
+        expect(['highly-likely', 'likely', 'possible', 'not-likely', 'very-unlikely']).toContain(condition.statusLabel);
       }
 
       // With Centor-like findings, strep should be ranked higher than viral

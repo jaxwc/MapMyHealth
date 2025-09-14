@@ -330,7 +330,7 @@ i      probabilityBands: [
         expect(ranking.label).toBeDefined();
         expect(ranking.probability).toBeDefined();
         expect(ranking.statusLabel).toBeDefined();
-        expect(['highly-likely', 'likely', 'unknown', 'not-likely', 'very-unlikely']).toContain(ranking.statusLabel);
+        expect(['highly-likely', 'likely', 'possible', 'not-likely', 'very-unlikely']).toContain(ranking.statusLabel);
       }
     });
 

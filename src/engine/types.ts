@@ -42,7 +42,7 @@ export interface ConditionDef {
     }>;
   };
   probabilityBands: Array<{
-    category: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
+    category: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely";
     minInclusive: number;
     maxExclusive: number;
   }>;
@@ -54,7 +54,7 @@ export interface ConditionDef {
     source: SourceMeta;
   }>;
   recommendationsByBand: Record<
-    "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely",
+    "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely",
     Recommendation
   >;
 }
@@ -162,7 +162,7 @@ export interface Beliefs {
 
 export interface Classification {
   top: Array<[ID, number]>; // [conditionId, probability]
-  label: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
+  label: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely";
   recommendation: Recommendation;
 }
 
@@ -252,7 +252,7 @@ export interface ConditionRanking {
   id: ID;
   label: string;
   probability: number;
-  statusLabel: "highly-likely" | "likely" | "unknown" | "not-likely" | "very-unlikely";
+  statusLabel: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely";
 }
 
 export interface WhyExplanation {
@@ -275,6 +275,38 @@ export interface ActionRanking {
   expectedInfoGain: number;
   costs: ActionDef['costs'];
   outcomeProbs: Record<ID, number>;
+}
+
+// Escalation system types
+export interface EscalationRule {
+  condition: string; // "symptom_worsening"
+  action: "urgent_care" | "reevaluate" | "add_actions" | "change_triage";
+  parameters?: any;
+}
+
+export interface UrgencyEffect {
+  urgent: boolean;
+  reason: string;
+  flags?: string[];
+}
+
+export interface NextActionEffect {
+  actionIds: string[];
+  priority: "high" | "medium" | "low";
+}
+
+export interface EscalationAction {
+  type: "urgent_care" | "add_actions" | "change_triage" | "notify_provider";
+  reason: string;
+  parameters: any;
+}
+
+export interface ActionChain {
+  id: string;
+  trigger: string;
+  requiredPrecedingAction: string;
+  chainedActions: string[];
+  automaticProgression?: boolean;
 }
 
 export interface TriageResult {

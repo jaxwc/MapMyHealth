@@ -180,37 +180,193 @@
     "outcomes": [
       {
         "id": "improving",
-        "label": "Symptoms improving",
+        "label": "Symptoms improving after 48h",
         "probabilityHint": 0.6,
         "effects": [
           {
-            "findingId": "sore_throat",
-            "presence": "absent"
+            "findingId": "symptom_improvement",
+            "presence": "present"
           }
         ]
       },
       {
         "id": "worse",
-        "label": "Symptoms worse",
+        "label": "Symptoms worsening after 48h",
         "probabilityHint": 0.15,
         "effects": [
           {
-            "findingId": "sore_throat",
-            "presence": "present"
-          },
-          {
-            "findingId": "fever",
+            "findingId": "symptom_worsening",
             "presence": "present"
           }
         ]
       },
       {
         "id": "no_change",
-        "label": "No change in symptoms",
+        "label": "No change in symptoms after 48h",
         "probabilityHint": 0.25,
         "effects": [
           {
-            "findingId": "sore_throat",
+            "findingId": "symptom_stable",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "urgent_medical_evaluation",
+    "label": "Urgent medical evaluation needed",
+    "kind": "EscalationAction",
+    "preconditions": {
+      "requireFindings": ["symptom_worsening"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 200,
+      "timeHours": 2,
+      "difficulty": 3,
+      "risk": 0
+    },
+    "outcomes": [
+      {
+        "id": "provider_contacted",
+        "label": "Healthcare provider contacted",
+        "probabilityHint": 0.9,
+        "effects": [
+          {
+            "findingId": "provider_notified",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "appointment_scheduled",
+        "label": "Urgent appointment scheduled",
+        "probabilityHint": 0.8,
+        "effects": [
+          {
+            "findingId": "urgent_appointment_scheduled",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "er_referral",
+        "label": "Emergency room referral given",
+        "probabilityHint": 0.3,
+        "effects": [
+          {
+            "findingId": "er_referral_given",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "consider_er_visit",
+    "label": "Consider emergency room visit",
+    "kind": "EscalationAction",
+    "preconditions": {
+      "requireFindings": ["symptom_worsening"],
+      "forbidFindings": ["provider_notified"],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 500,
+      "timeHours": 4,
+      "difficulty": 2,
+      "risk": 1
+    },
+    "outcomes": [
+      {
+        "id": "er_visit_decided",
+        "label": "Decision made to visit emergency room",
+        "probabilityHint": 0.6,
+        "effects": [
+          {
+            "findingId": "er_visit_planned",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "continue_monitoring",
+        "label": "Continue monitoring at home",
+        "probabilityHint": 0.4,
+        "effects": [
+          {
+            "findingId": "continued_home_monitoring",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "reassess_symptoms",
+    "label": "Comprehensive symptom reassessment",
+    "kind": "EscalationAction",
+    "preconditions": {
+      "requireFindings": ["symptom_worsening"],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 0,
+      "timeHours": 0.5,
+      "difficulty": 1,
+      "risk": 0
+    },
+    "outcomes": [
+      {
+        "id": "new_symptoms_identified",
+        "label": "New symptoms identified",
+        "probabilityHint": 0.4,
+        "effects": [
+          {
+            "findingId": "additional_symptoms_found",
+            "presence": "present"
+          }
+        ]
+      },
+      {
+        "id": "symptoms_clarified",
+        "label": "Existing symptoms better characterized",
+        "probabilityHint": 0.6,
+        "effects": [
+          {
+            "findingId": "symptom_progression_documented",
+            "presence": "present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "immediate_medical_attention",
+    "label": "Seek immediate medical attention",
+    "kind": "EscalationAction",
+    "preconditions": {
+      "requireFindings": [],
+      "forbidFindings": [],
+      "requireActions": []
+    },
+    "costs": {
+      "money": 1000,
+      "timeHours": 6,
+      "difficulty": 4,
+      "risk": 0
+    },
+    "outcomes": [
+      {
+        "id": "emergency_care_received",
+        "label": "Emergency medical care received",
+        "probabilityHint": 1.0,
+        "effects": [
+          {
+            "findingId": "emergency_care_completed",
             "presence": "present"
           }
         ]

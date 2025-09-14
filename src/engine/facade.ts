@@ -45,6 +45,7 @@ export interface RankedCondition {
   id: ConditionId;
   name: string;
   score: number;
+  statusLabel: "highly-likely" | "likely" | "possible" | "not-likely" | "very-unlikely";
   rationale?: string;
 }
 
@@ -118,6 +119,7 @@ export interface EngineFacade {
     probEstimate: number;
     effects: any;
   }>>;
+  getContentPack(): ContentPack;
 }
 
 /**
@@ -200,6 +202,10 @@ export class EngineFacadeImpl implements EngineFacade {
     }));
   }
 
+  getContentPack(): ContentPack {
+    return this.contentPack;
+  }
+
   private convertToCaseState(inputs: EngineInputs): CaseState {
     const findings: FindingValue[] = inputs.knownFindings.map(kf => ({
       findingId: kf.id,
@@ -224,7 +230,8 @@ export class EngineFacadeImpl implements EngineFacade {
       id: rc.id,
       name: rc.label,
       score: rc.probability,
-      rationale: `${(rc.probability * 100).toFixed(1)}% probability (${rc.statusLabel})`
+      statusLabel: rc.statusLabel,
+      rationale: `${(rc.probability * 100).toFixed(1)}% probability`
     }));
 
     const importantUnknowns: UnknownQuestion[] = viewModel.topPanel.mostInformativeUnknowns.map(iu => ({
