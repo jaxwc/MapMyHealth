@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useRef, useEffect } from 'react';
-import { HealthData } from '@/app/page';
+// Remove unused import - ChatPanel will work with store directly
 import { SendHorizonal } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -18,7 +18,7 @@ interface Message {
 }
 
 interface ChatPanelProps {
-  onNewData: (data: HealthData) => void;
+  // No props needed - ChatPanel uses store directly now
 }
 
 const TypingIndicator = () => (
@@ -29,7 +29,7 @@ const TypingIndicator = () => (
   </div>
 );
 
-export default function ChatPanel({ onNewData }: ChatPanelProps) {
+export default function ChatPanel({}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
     { sender: "ai", text: "How can I help you today?" },
   ]);
@@ -67,7 +67,8 @@ export default function ChatPanel({ onNewData }: ChatPanelProps) {
       const aiMessage: Message = { sender: "ai", text: data.responseText };
       setMessages((prev) => [...prev, aiMessage]);
 
-      onNewData(data.analysis);
+      // TODO: Use health store to update findings based on chat analysis
+      // For now, remove this call since we use store-based architecture
 
     } catch (error) {
       console.error("Failed to fetch AI response:", error);
