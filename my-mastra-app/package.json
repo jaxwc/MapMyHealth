@@ -1,0 +1,37 @@
+{
+  "name": "my-mastra-app",
+  "version": "1.0.0",
+  "description": "Mastra 101 Course - Learning to build AI agents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lesson1": "ts-node lesson-1/health-agent.ts",
+    "lesson2": "ts-node lesson-2/enhanced-health-agent.ts",
+    "lesson3": "ts-node lesson-3/memory-health-agent.ts",
+    "lesson4": "ts-node lesson-4/health-workflows.ts",
+    "dev": "ts-node --watch lesson-1/health-agent.ts"
+  },
+  "keywords": [
+    "mastra",
+    "ai",
+    "agent",
+    "health",
+    "course"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@ai-sdk/google": "^2.0.14",
+    "@mastra/core": "^0.16.3",
+    "@mastra/libsql": "^0.14.1",
+    "@mastra/memory": "^0.15.1",
+    "dotenv": "^17.2.2",
+    "mastra": "^0.1.56"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
