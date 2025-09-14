@@ -10,9 +10,9 @@ export default function Home() {
   return (
     <main className="flex flex-col md:flex-row h-screen w-screen bg-slate-900 font-sans p-4 gap-4 overflow-hidden">
 
-      <div className="w-full md:w-[400px] md:flex-shrink-0 h-full flex flex-col">
+      <div className="w-full md:w-[400px] md:flex-shrink-0 h-full min-h-0 flex flex-col">
         <Header />
-        <div className="flex-1">
+        <div className="flex-1 min-h-0">
           <ChatPanel />
         </div>
       </div>

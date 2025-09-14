@@ -13,7 +13,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   CheckCircle,
   HelpCircle,
@@ -70,6 +72,7 @@ export default function Top() {
 
   // Content pack: all findings for "+" dropdown
   const [allFindings, setAllFindings] = useState<Array<{ id: string; label?: string }>>([]);
+  const [findingFilter, setFindingFilter] = useState("");
   useEffect(() => {
     const load = async () => {
       try {
@@ -110,7 +113,7 @@ export default function Top() {
       <div className="flex flex-col space-y-9">
         <div className="flex items-center justify-between flex-shrink-0">
         <h3 className="text-xl font-bold text-slate-100">
-          Analysis Summary
+          Health Analysis
         </h3>
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-slate-400" />
@@ -144,14 +147,6 @@ export default function Top() {
         </div>
       )}
 
-      {/* Engine Recommendation */}
-      {/* {engineRecommendation && (
-        <div className="bg-blue-900/50 border border-blue-500/50 rounded-lg p-3 flex-shrink-0">
-          <p className="text-blue-200 text-sm font-medium">
-            📋 {engineRecommendation}
-          </p>
-        </div>
-      )} */}
 
       <div className="flex flex-col md:flex-row gap-4">
         {/* Known Findings */}
@@ -160,26 +155,6 @@ export default function Top() {
             <h4 className="font-semibold text-cyan-400 flex items-center gap-2">
               <CheckCircle className="w-5 h-5" /> Known Findings
             </h4>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-slate-200">
-                  <Plus className="w-4 h-4 mr-1" /> Add
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="max-h-72 w-64 overflow-auto bg-slate-800 text-slate-200 border-slate-600">
-                {allFindings
-                  .filter(f => !new Set(knownFindings.filter(k => k.presence === 'present').map(k => k.id)).has(f.id))
-                  .map((f) => (
-                    <DropdownMenuItem
-                      key={f.id}
-                      onClick={() => addFinding({ id: f.id, presence: 'present', source: 'user' })}
-                      className="cursor-pointer"
-                    >
-                      {f.label || f.id}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <div className="flex flex-wrap gap-2">
             {knownFindings.filter(f => f.presence === 'present').slice(0, 20).map((finding, i) => (
@@ -193,6 +168,43 @@ export default function Top() {
             {knownFindings.filter(f => f.presence === 'present').length === 0 && (
               <p className="text-sm text-slate-400">No findings yet. Use Add to select findings.</p>
             )}
+            {/* Always show Add at end of list */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-slate-200">
+                  <Plus className="w-4 h-4 mr-1" /> Add Finding
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-h-72 w-64 overflow-auto bg-slate-800 text-slate-200 border-slate-600">
+                <div className="px-2 pt-2">
+                  <Input
+                    placeholder="Filter findings..."
+                    value={findingFilter}
+                    onChange={(e) => setFindingFilter(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="h-8 bg-slate-700 border-slate-600 text-slate-200 placeholder:text-slate-400"
+                  />
+                </div>
+                <DropdownMenuSeparator className="my-2 bg-slate-700" />
+                {allFindings
+                  .filter(f => !new Set(knownFindings.filter(k => k.presence === 'present').map(k => k.id)).has(f.id))
+                  .filter(f => {
+                    const q = findingFilter.trim().toLowerCase();
+                    if (!q) return true;
+                    const label = (f.label || "").toLowerCase();
+                    return f.id.toLowerCase().includes(q) || label.includes(q);
+                  })
+                  .map((f) => (
+                    <DropdownMenuItem
+                      key={f.id}
+                      onClick={() => addFinding({ id: f.id, presence: 'present', source: 'user' })}
+                      className="cursor-pointer"
+                    >
+                      {f.label || f.id}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -221,30 +233,32 @@ export default function Top() {
         {knownFindings.length === 0 || rankedConditions.length === 0 ? (
           <p className="text-sm text-slate-400">Add findings to determine.</p>
         ) : (
-          <ScrollArea className="w-full">
-            <div className="flex gap-4 pb-4">
-              {rankedConditions.slice(0, 5).map((condition, i) => (
-                <Card
-                  key={i}
-                  className="w-[280px] flex-shrink-0 rounded-lg bg-slate-700/40 border-pink-500/30 text-slate-200"
-                >
-                  <CardHeader>
-                    <CardTitle className="text-pink-400">
-                      {condition.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-300 mb-2">
-                      <strong>{(condition.score * 100).toFixed(1)}%</strong> probability
-                    </p>
-                    {condition.rationale && (
-                      <p className="text-xs text-slate-400">
-                        {condition.rationale}
+          <ScrollArea className="w-full max-w-full">
+            <div className="w-max">
+              <div className="flex gap-4 pb-4">
+                {rankedConditions.slice(0, 5).map((condition, i) => (
+                  <Card
+                    key={i}
+                    className="w-[280px] flex-shrink-0 rounded-lg bg-slate-700/40 border-pink-500/30 text-slate-200"
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-pink-400">
+                        {condition.name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-slate-300 mb-2">
+                        <strong>{(condition.score * 100).toFixed(1)}%</strong> probability
                       </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                      {condition.rationale && (
+                        <p className="text-xs text-slate-400">
+                          {condition.rationale}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -253,7 +267,7 @@ export default function Top() {
 
       {/* Treatment Recommendations */}
       <div className="flex-shrink-0">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3 mb-2">
           <h4 className="font-semibold text-green-400 flex items-center gap-2">
             <HeartPulse className="w-5 h-5" /> Treatment Recommendations
           </h4>
