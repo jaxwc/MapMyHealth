@@ -106,8 +106,9 @@ export default function Top() {
   };
 
   return (
-    <ScrollArea className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6 flex flex-col space-y-9">
-      <div className="flex items-center justify-between flex-shrink-0">
+    <ScrollArea className="h-full w-full rounded-lg border border-pink-500/30 bg-slate-800 p-6">
+      <div className="flex flex-col space-y-9">
+        <div className="flex items-center justify-between flex-shrink-0">
         <h3 className="text-xl font-bold text-slate-100">
           Analysis Summary
         </h3>
@@ -293,6 +294,7 @@ export default function Top() {
             Click "Update Treatment" to generate AI-powered treatment recommendations.
           </p>
         )}
+        </div>
       </div>
       <ScrollBar orientation="vertical" />
     </ScrollArea>
