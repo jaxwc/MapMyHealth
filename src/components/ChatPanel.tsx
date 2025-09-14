@@ -25,6 +25,7 @@ interface Message {
   sender: "user" | "ai";
   text: string;
   jsx?: React.ReactNode;
+  kind?: 'breadcrumb' | 'normal';
 }
 
 interface ChatPanelProps {
@@ -41,7 +42,7 @@ const TypingIndicator = () => (
 
 export default function ChatPanel({}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { sender: "ai", text: "How can I help you today?" },
+    { sender: "ai", text: "Hello! I am your health assistant. How can I help you today?" },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,10 +50,7 @@ export default function ChatPanel({}: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamMsgIndexRef = useRef<number | null>(null);
 
-  // Store actions for client-side reconciliation when tools run on the server
-  const addFindingStore = useHealthStore(state => state.addFinding);
-  const removeFindingStore = useHealthStore(state => state.removeFinding);
-  const applyActionOutcomeStore = useHealthStore(state => state.applyActionOutcome);
+  // Server-authoritative sync helpers
   const replaceAll = useHealthStore(state => (state as any).replaceAll);
   const stateVersion = useHealthStore((state: any) => state.stateVersion);
 
@@ -104,33 +102,58 @@ export default function ChatPanel({}: ChatPanelProps) {
       // Show breadcrumbs only for tool-call, not for tool-result
       const pushBreadcrumb = (phase: string, toolName?: string) => {
         if (phase !== 'tool-call') return;
-        const label = `${phase}${toolName ? `: ${toolName}` : ''}`;
-        setMessages((prev) => [...prev, { sender: 'ai', text: `[${label}]` }]);
+        const toFriendly = (name?: string) => {
+          switch (name) {
+            case 'addFinding':
+              return 'Adding finding...';
+            case 'removeFinding':
+              return 'Removing finding...';
+            case 'applyActionOutcome':
+              return 'Applying action outcome...';
+            case 'setPatientData':
+              return 'Updating patient data...';
+            case 'resetAll':
+              return 'Resetting session...';
+            case 'readHealthState':
+              return 'Reading health state...';
+            case 'readKnownFindings':
+              return 'Fetching findings...';
+            case 'readTopConditions':
+              return 'Analyzing conditions...';
+            case 'readActionRanking':
+              return 'Ranking next actions...';
+            case 'readActionMap':
+              return 'Building action map...';
+            case 'renderActionGraphMermaid':
+              return 'Rendering action diagram...';
+            case 'externalSearch':
+              return 'Searching the web...';
+            default:
+              return 'Working...';
+          }
+        };
+        const label = toFriendly(toolName);
+        setMessages((prev) => [...prev, { sender: 'ai', text: label, kind: 'breadcrumb' }]);
       };
 
-      const pushUI = (ui: any) => {
-        // Render using shared components by pushing a special Message with a JSX payload
-        const render = () => {
-          if (ui?.ui === 'finding-chip') {
-            return <HealthChip text={ui.id} variant={ui.presence === 'absent' ? 'absent' : 'present'} />;
-          }
-          if (ui?.ui === 'condition-card') {
-            const cond = useStore.getState().rankedConditions.find((c: any) => c.id === ui.conditionId);
-            if (cond) return <ConditionCard condition={cond} />;
-            return <div className="text-slate-300 text-sm">Condition: {ui.conditionId}</div>;
-          }
-          if (ui?.ui === 'action-card') {
-            const act = useStore.getState().actionRanking.find((a: any) => a.actionId === ui.actionId);
-            if (act) return <ActionCard action={act} />;
-            return <div className="text-slate-300 text-sm">Action: {ui.actionId}</div>;
-          }
-          if (ui?.ui === 'mermaid') {
-            return <MermaidDiagram definition={ui.definition} />;
-          }
-          return <div className="text-slate-300 text-xs">{JSON.stringify(ui)}</div>;
-        };
-
-        setMessages((prev) => [...prev, { sender: 'ai', text: '', jsx: render() } as any]);
+      const renderUI = (ui: any) => {
+        if (ui?.ui === 'finding-chip') {
+          return <HealthChip text={ui.id} variant={ui.presence === 'absent' ? 'absent' : 'present'} />;
+        }
+        if (ui?.ui === 'condition-card') {
+          const cond = useStore.getState().rankedConditions.find((c: any) => c.id === ui.conditionId);
+          if (cond) return <ConditionCard condition={cond} />;
+          return <div className="text-slate-300 text-sm">Condition: {ui.conditionId}</div>;
+        }
+        if (ui?.ui === 'action-card') {
+          const act = useStore.getState().actionRanking.find((a: any) => a.actionId === ui.actionId);
+          if (act) return <ActionCard action={act} />;
+          return <div className="text-slate-300 text-sm">Action: {ui.actionId}</div>;
+        }
+        if (ui?.ui === 'mermaid') {
+          return <MermaidDiagram definition={ui.definition} />;
+        }
+        return <div className="text-slate-300 text-xs">{JSON.stringify(ui)}</div>;
       };
 
       const renderMarkdown = (text: string) => (
@@ -206,20 +229,16 @@ export default function ChatPanel({}: ChatPanelProps) {
         return segments;
       };
 
-      const reconcileToolResult = async (toolName: string, args: any) => {
+      const reconcileToolResult = async () => {
+        // Server-authoritative: fetch latest snapshot and replace local state
         try {
-          if (toolName === 'addFinding' && args?.id && args?.presence) {
-            console.debug('[ChatPanel] Reconciling addFinding to client store', args);
-            await addFindingStore({ id: args.id, presence: args.presence, value: args.value, daysSinceOnset: args.daysSinceOnset, severity: args.severity, source: 'agent' } as any);
-          } else if (toolName === 'removeFinding' && args?.id) {
-            console.debug('[ChatPanel] Reconciling removeFinding to client store', args);
-            await removeFindingStore(args.id);
-          } else if (toolName === 'applyActionOutcome' && args?.actionId && args?.outcomeId) {
-            console.debug('[ChatPanel] Reconciling applyActionOutcome to client store', args);
-            await applyActionOutcomeStore(args.actionId, args.outcomeId);
+          const res = await fetch('/api/state', { cache: 'no-store' });
+          if (res.ok) {
+            const snapshot = await res.json();
+            replaceAll(snapshot);
           }
         } catch (err) {
-          console.warn('[ChatPanel] Failed to reconcile tool result locally', err);
+          console.warn('[ChatPanel] Failed to hydrate after tool-result', err);
         }
       };
 
@@ -242,34 +261,48 @@ export default function ChatPanel({}: ChatPanelProps) {
               const toolName = evt.data?.toolName;
               pushBreadcrumb(phase, toolName);
             } else if (evt.type === 'done') {
-              // Replace the streaming message with structured markdown + UI segments
+              // Replace the streaming message with one combined bubble containing markdown and inline UI
               const segments = extractSegments(evt.data || aggregated);
+              const jsx = (
+                <div className="space-y-3">
+                  {segments.map((seg, i) => (
+                    <div key={i}>
+                      {seg.type === 'markdown' ? renderMarkdown(seg.value) : renderUI(seg.value)}
+                    </div>
+                  ))}
+                </div>
+              );
               setMessages((prev) => {
                 const updated = [...prev];
                 const idx = streamMsgIndexRef.current;
-                // remove the streaming placeholder if present
                 if (idx != null && updated[idx]) {
-                  updated.splice(idx, 1);
+                  updated[idx] = { sender: 'ai', text: '', jsx } as any;
+                } else {
+                  updated.push({ sender: 'ai', text: '', jsx } as any);
                 }
                 streamMsgIndexRef.current = null;
-                for (const seg of segments) {
-                  if (seg.type === 'markdown') {
-                    const md = seg.value?.trim();
-                    if (md) updated.push({ sender: 'ai', text: '', jsx: renderMarkdown(md) } as any);
-                  } else if (seg.type === 'ui') {
-                    pushUI(seg.value);
-                  }
-                }
                 return updated;
               });
             } else if (evt.type === 'ui') {
-              pushUI(evt.data);
+              // Inline UI updates outside of final message: show as its own bubble
+              const jsx = <div className="space-y-3">{renderUI(evt.data)}</div>;
+              setMessages((prev) => [...prev, { sender: 'ai', text: '', jsx } as any]);
             } else if (evt.type === 'tool') {
               // no-op; avoid noisy local echoes
             } else if (evt.type === 'tool-result') {
               // Reconcile store locally so UI reflects changes immediately
-              if (evt.data?.toolName) {
-                reconcileToolResult(evt.data.toolName, evt.data.args);
+              reconcileToolResult();
+              // Show contextual UI bubble for added symptoms
+              if (evt.data?.toolName === 'addFinding' && evt.data?.args?.id) {
+                const id = evt.data.args.id;
+                const presence = evt.data.args.presence || 'present';
+                const jsx = (
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-300 text-sm">Added:</span>
+                    <HealthChip text={id} variant={presence === 'absent' ? 'absent' : 'present'} />
+                  </div>
+                );
+                setMessages((prev) => [...prev, { sender: 'ai', text: '', jsx } as any]);
               }
             } else if (evt.type === 'stateVersion') {
               const incoming = Number(evt.data);
@@ -341,23 +374,29 @@ export default function ChatPanel({}: ChatPanelProps) {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex flex-col mb-4 ${
+            className={`flex flex-col mb-3 ${
               msg.sender === "user" ? "items-end" : "items-start"
             }`}
           >
-            <div
-              className={`rounded-2xl p-3 max-w-sm ${
-                msg.sender === "user"
-                  ? "bg-cyan-500 text-slate-900 font-semibold rounded-br-none"
-                  : "bg-slate-700 text-slate-200 rounded-bl-none"
-              }`}
-            >
-              {msg.jsx ? (
-                <div className="max-w-full text-slate-200">{msg.jsx}</div>
-              ) : (
-                <p className="whitespace-pre-wrap">{msg.text}</p>
-              )}
-            </div>
+            {msg.kind === 'breadcrumb' ? (
+              <div className="text-pink-300 text-xs tracking-wide uppercase animate-pulse">
+                {msg.text}
+              </div>
+            ) : (
+              <div
+                className={`rounded-2xl p-4 max-w-[680px] ${
+                  msg.sender === "user"
+                    ? "bg-cyan-500 text-slate-900 font-semibold rounded-br-none"
+                    : "bg-slate-700 text-slate-200 rounded-bl-none"
+                }`}
+              >
+                {msg.jsx ? (
+                  <div className="max-w-full text-slate-200">{msg.jsx}</div>
+                ) : (
+                  <p className="whitespace-pre-wrap">{msg.text}</p>
+                )}
+              </div>
+            )}
           </div>
         ))}
         {isLoading && (
