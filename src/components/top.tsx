@@ -448,9 +448,8 @@ export default function Top() {
             {actionRanking.slice(0, 5).map((action) => (
               <ActionCard
                 key={action.actionId}
-                className={`bg-slate-700/40 border-slate-600 cursor-pointer transition-all ${selectedAction === action.actionId
-                    ? 'border-cyan-400 ring-1 ring-cyan-400/50'
-                    : 'hover:border-slate-500'}`}
+                action={action}
+                selected={selectedAction === action.actionId}
                 onClick={() => setSelectedAction(action.actionId)}
               />
             ))}

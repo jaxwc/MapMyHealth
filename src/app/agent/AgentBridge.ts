@@ -182,6 +182,33 @@ export const Agent = {
   },
 
   /**
+   * Resolve a human-friendly outcome name (e.g., "positive") to a canonical outcomeId for an action.
+   */
+  _resolveOutcomeId: (actionId: string, raw: string): string | null => {
+    const store = useHealthStore.getState();
+    const outcomes = store.getActionOutcomes(actionId);
+    if (!outcomes) return null;
+    const list = outcomes.outcomes || [];
+    const want = String(raw || '').toLowerCase().trim();
+
+    const exactId = list.find(o => (o.outcomeId || '').toLowerCase() === want)?.outcomeId;
+    if (exactId) return exactId;
+    const exactLabel = list.find(o => (o.label || '').toLowerCase() === want)?.outcomeId;
+    if (exactLabel) return exactLabel;
+
+    const contains = (substr: string) =>
+      list.find(o => (o.outcomeId || '').toLowerCase().includes(substr) || (o.label || '').toLowerCase().includes(substr))?.outcomeId || null;
+
+    if (want === 'positive' || want === 'pos' || want === '+') {
+      return contains('positive') || contains('pos') || list[0]?.outcomeId || null;
+    }
+    if (want === 'negative' || want === 'neg' || want === '-') {
+      return contains('negative') || contains('neg') || list[1]?.outcomeId || null;
+    }
+    return contains(want);
+  },
+
+  /**
    * Applies a selected outcome for an action and mutates state accordingly.
    * Use this when the user confirms an action choice.
    * @param actionId - action being applied
@@ -190,7 +217,8 @@ export const Agent = {
   applyActionOutcome: async (actionId: string, outcomeId: string) => {
     const store = useHealthStore.getState();
     console.debug('[AgentBridge] applyActionOutcome', { actionId, outcomeId });
-    const res = await store.applyActionOutcome(actionId, outcomeId);
+    const resolved = Agent._resolveOutcomeId(actionId, outcomeId) || outcomeId;
+    const res = await store.applyActionOutcome(actionId, resolved);
     console.debug('[AgentBridge] applyActionOutcome → recompute triggered');
     return res;
   },
@@ -210,11 +238,12 @@ export const Agent = {
 
     if (isBrowser) {
       try {
+        const resolved = Agent._resolveOutcomeId(actionId, outcomeId) || outcomeId;
         console.debug('[AgentBridge] takeAction → POST /api/state/mutate', { actionId, outcomeId });
         const response = await fetch('/api/state/mutate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ op: 'applyActionOutcome', payload: { actionId, outcomeId } })
+          body: JSON.stringify({ op: 'applyActionOutcome', payload: { actionId, outcomeId: resolved } })
         });
 
         if (!response.ok) {
@@ -228,14 +257,16 @@ export const Agent = {
         return useHealthStore.getState();
       } catch (error) {
         console.warn('[AgentBridge] takeAction server path failed, falling back to local store', error);
-        await store.applyActionOutcome(actionId, outcomeId);
+        const resolved = Agent._resolveOutcomeId(actionId, outcomeId) || outcomeId;
+        await store.applyActionOutcome(actionId, resolved);
         return useHealthStore.getState();
       }
     }
 
     // Server-side or non-browser: apply directly to the store
-    console.debug('[AgentBridge] takeAction (server/local) applyActionOutcome', { actionId, outcomeId });
-    await store.applyActionOutcome(actionId, outcomeId);
+    const resolved = Agent._resolveOutcomeId(actionId, outcomeId) || outcomeId;
+    console.debug('[AgentBridge] takeAction (server/local) applyActionOutcome', { actionId, outcomeId: resolved });
+    await store.applyActionOutcome(actionId, resolved);
     return useHealthStore.getState();
   },
 
